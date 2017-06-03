@@ -12,7 +12,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
+using System.Diagnostics;
+using Windows.Storage;
 
 namespace Pixiv_Wallpaper_for_Win10
 {
@@ -31,6 +32,16 @@ namespace Pixiv_Wallpaper_for_Win10
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             lis.IsPaneOpen = !lis.IsPaneOpen;
+        }
+
+        private void show_btn_Click(object sender, RoutedEventArgs e)
+        {
+            main.Navigate(typeof(ShowPage));
+        }
+
+        private void setting_btn_Click(object sender, RoutedEventArgs e)
+        {
+            main.Navigate(typeof(SettingPage));
         }
     }
 }

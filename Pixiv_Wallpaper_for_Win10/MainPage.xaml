@@ -14,7 +14,7 @@
                     <Button FontSize="18" VerticalAlignment="Top" Width="140" Height="50" FontFamily="Segoe MDL2 Assets" Click="Button_Click" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark">
                         <TextBlock Text="&#xE700;"></TextBlock>
                     </Button>
-                    <Button FontSize="18" Height="50" Width="140" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark">
+                    <Button x:Name="show_btn" FontSize="18" Height="50" Width="140" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark" Click="show_btn_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE80F;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <TextBlock Text="预览" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -26,7 +26,7 @@
                             <TextBlock Text="历史记录" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                         </StackPanel>
                     </Button>
-                    <Button FontSize="18" VerticalAlignment="Bottom" Height="50" Width="140" HorizontalContentAlignment="Left" Margin="0" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark">
+                    <Button x:Name="setting_btn" FontSize="18" VerticalAlignment="Bottom" Height="50" Width="140" HorizontalContentAlignment="Left" Margin="0" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark" Click="setting_btn_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE713;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <TextBlock Text="设置" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
