@@ -24,25 +24,10 @@ namespace Pixiv_Wallpaper_for_Win10
     public sealed partial class SettingPage : Page
     {
         ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;  //获取本地应用设置容器(单例)
-       /* public SettingPage()
+        public SettingPage()
         {
             this.InitializeComponent();
         }
-
-        private void RadioButton_Checked(System.Object sender, RoutedEventArgs e)     
-        {
-            
-        }
-
-        private void radiobutton2_Checked(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void textbox1_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        } */
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
@@ -58,10 +43,5 @@ namespace Pixiv_Wallpaper_for_Win10
             localSettings.Values["Password"] = passwordbox1.Password;    //保存密码
             localSettings.Values["Time"] = combox1.SelectedValue;    //保存时间
         }
-
-       /* private void combox1_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        } */
     }
 }

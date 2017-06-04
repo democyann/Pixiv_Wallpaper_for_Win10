@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
 using Windows.Storage;
+using Pixiv_Wallpaper_for_Win10.Util;
 
 namespace Pixiv_Wallpaper_for_Win10
 {
@@ -29,9 +30,20 @@ namespace Pixiv_Wallpaper_for_Win10
             main.Navigate(typeof(ShowPage));
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             lis.IsPaneOpen = !lis.IsPaneOpen;
+
+            //测试方法，输出top50列表
+        
+            //HttpUtil http = new HttpUtil("https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json", HttpUtil.Contype.JSON);
+            HttpUtil http = new HttpUtil("https://www.pixiv.net", HttpUtil.Contype.HTML);
+
+            string s = await http.GetDataAsync();
+            Debug.WriteLine(s);
+            Debug.WriteLine(http.cookie);
+
+            //================
         }
 
         private void show_btn_Click(object sender, RoutedEventArgs e)

@@ -11,20 +11,20 @@
         <StackPanel Name="sp1" >
             <TextBlock Text="更新时间" Margin="30,10,0,0" FontSize="20"/>
             <TextBlock Text="设置更新图片的时间间隔" FontSize="15" Margin="30,0,0,0"/>
-            <ComboBox Margin="30,10,0,0" Width="200" Name="combox1" SelectionChanged="combox1_SelectionChanged">
-                <ComboBoxItem >1分钟</ComboBoxItem>
-                <ComboBoxItem >5分钟</ComboBoxItem>
-                <ComboBoxItem >15分钟</ComboBoxItem>
-                <ComboBoxItem >30分钟</ComboBoxItem>
-                <ComboBoxItem >60分钟</ComboBoxItem>
+            <ComboBox Margin="30,10,0,0" Width="200" Name="combox1" SelectedIndex="0">
+                <ComboBoxItem Tag="1">1分钟</ComboBoxItem>
+                <ComboBoxItem Tag="5">5分钟</ComboBoxItem>
+                <ComboBoxItem Tag="15">15分钟</ComboBoxItem>
+                <ComboBoxItem Tag="30">30分钟</ComboBoxItem>
+                <ComboBoxItem Tag="60">60分钟</ComboBoxItem>
             </ComboBox>
             <TextBlock Text="推荐模式" Margin="30,0,0,0" FontSize="20"/>
-            <RadioButton Name="radiobutton1" Margin="30,0,0,0" Content="每日Top50" Checked="RadioButton_Checked" />
-            <RadioButton Name="radiobutton2" Margin="30,0,0,0" Content="猜你喜欢（需登录）" Checked="radiobutton2_Checked" />
+            <RadioButton Name="radiobutton1" Margin="30,0,0,0" Content="每日Top50" IsChecked="True"/>
+            <RadioButton Name="radiobutton2" Margin="30,0,0,0" Content="猜你喜欢（需登录）"/>
             <TextBlock Text="Pixiv登录信息" Margin="30,10,0,0" FontSize="15"/>
             <StackPanel Name="sp2" Orientation="Horizontal">
                 <TextBlock Text="账号:" Margin="30,10,0,0" FontSize="15"/>
-                <TextBox Name="textbox1" Margin="10,10,0,0"  Width="200" TextChanged="textbox1_TextChanged" />
+                <TextBox Name="textbox1" Margin="10,10,0,0"  Width="200"/>
             </StackPanel>
             <StackPanel Name="sp3" Orientation="Horizontal">
                 <TextBlock Text="密码:" Margin="30,10,0,0" FontSize="15"/>
