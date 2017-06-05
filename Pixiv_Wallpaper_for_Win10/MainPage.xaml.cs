@@ -34,16 +34,20 @@ namespace Pixiv_Wallpaper_for_Win10
         {
             lis.IsPaneOpen = !lis.IsPaneOpen;
 
-            //测试方法，输出top50列表
-        
-            //HttpUtil http = new HttpUtil("https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json", HttpUtil.Contype.JSON);
-            HttpUtil http = new HttpUtil("https://www.pixiv.net", HttpUtil.Contype.HTML);
+            //============图片下载示例代码============
 
-            string s = await http.GetDataAsync();
-            Debug.WriteLine(s);
-            Debug.WriteLine(http.cookie);
+            //string url = "https://i.pximg.net/img-original/img/2016/02/29/23/44/55/55558612_p0.jpg";
+            //string refurl = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=55558612";
 
-            //================
+            //HttpUtil test = new HttpUtil(url, HttpUtil.Contype.IMG);
+            //test.referer = refurl;
+            //string a= await test.ImageDownloadAsync("234234", "12333");
+
+            //main.Navigate(typeof(ShowPage),a);
+
+            //==========================================
+            
+
         }
 
         private void show_btn_Click(object sender, RoutedEventArgs e)

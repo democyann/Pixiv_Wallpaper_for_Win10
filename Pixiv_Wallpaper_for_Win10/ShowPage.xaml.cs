@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -13,6 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using System.Diagnostics;
 
 
 namespace Pixiv_Wallpaper_for_Win10
@@ -27,6 +29,15 @@ namespace Pixiv_Wallpaper_for_Win10
         {
             this.InitializeComponent();
             show_img.Source = new BitmapImage(new Uri("ms-appx:///Res/62258773_p0.png"));
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            if (e.Parameter != null)
+            {
+                Debug.WriteLine(e.Parameter.ToString());
+                show_img.Source = new BitmapImage(new Uri("ms-appdata:///temp/" + e.Parameter.ToString()));
+            }
         }
     }
 }
