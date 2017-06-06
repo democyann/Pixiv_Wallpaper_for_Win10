@@ -107,6 +107,7 @@
     </Compile>
     <Compile Include="Util\HttpUtil.cs" />
     <Compile Include="Util\Pixiv.cs" />
+    <Compile Include="Util\PixivTop50.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
