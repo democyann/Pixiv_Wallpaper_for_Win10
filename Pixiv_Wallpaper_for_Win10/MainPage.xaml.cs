@@ -36,17 +36,17 @@ namespace Pixiv_Wallpaper_for_Win10
 
             //============图片下载示例代码============
 
-            //string url = "https://i.pximg.net/img-original/img/2016/02/29/23/44/55/55558612_p0.jpg";
-            //string refurl = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=55558612";
+            string url = "https://i.pximg.net/img-original/img/2016/02/29/23/44/55/55558612_p0.jpg";
+            string refurl = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=55558612";
 
-            //HttpUtil test = new HttpUtil(url, HttpUtil.Contype.IMG);
-            //test.referer = refurl;
-            //string a= await test.ImageDownloadAsync("234234", "12333");
+            HttpUtil test = new HttpUtil(url, HttpUtil.Contype.IMG);
+            test.referer = refurl;
+            string a = await test.ImageDownloadAsync("234234", "12333");
 
-            //main.Navigate(typeof(ShowPage),a);
+            main.Navigate(typeof(ShowPage), a);
 
             //==========================================
-            
+
 
         }
 
