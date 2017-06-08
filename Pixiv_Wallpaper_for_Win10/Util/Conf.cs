@@ -9,6 +9,9 @@ using Windows.Storage;
 
 namespace Pixiv_Wallpaper_for_Win10.Util
 {
+    /// <summary>
+    /// 设置管理类
+    /// </summary>
     public class Conf
     {
         private ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
@@ -84,7 +87,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 }
             }
         }
-
+        /// <summary>
+        /// 是否更改锁屏
+        /// </summary>
         public bool lockscr
         {
             get
@@ -144,6 +149,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
         }
 
+        /// <summary>
+        /// 最后一次显示成功的图片信息
+        /// </summary>
         public ImageInfo lastImg
         {
             get

@@ -130,7 +130,12 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
             return res;
         }
-
+        /// <summary>
+        /// 图片下载方法
+        /// </summary>
+        /// <param name="userid">图片作者ID</param>
+        /// <param name="imgid">图片ID</param>
+        /// <returns>图片存储地址</returns>
         public async Task<string> ImageDownloadAsync(string userid, string imgid)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);

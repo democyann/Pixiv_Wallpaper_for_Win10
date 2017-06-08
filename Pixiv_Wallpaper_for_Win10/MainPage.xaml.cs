@@ -28,7 +28,9 @@ namespace Pixiv_Wallpaper_for_Win10
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private DispatcherTimer timer;
+        private DispatcherTimer timer;  //图片推送定时器
+        private DispatcherTimer li_uptimer; //列表更新定时器
+
         private Conf c;
         private PixivTop50 top50;
 
@@ -43,14 +45,35 @@ namespace Pixiv_Wallpaper_for_Win10
             timer.Tick += Timer_Tick;
             timer.Start();
 
+            li_uptimer = new DispatcherTimer();
+            li_uptimer.Interval = TimeSpan.FromHours(1);
+            li_uptimer.Tick += Li_uptimer_Tick;
+            li_uptimer.Start();
+
             main.Navigate(typeof(ShowPage));
+        }
+
+        private async void Li_uptimer_Tick(object sender, object e)
+        {
+            //定时更新列表(1h/次)
+            switch (c.mode)
+            {
+                case "Top_50":
+                    await top50.listUpdate();
+                    break;
+                default:
+                    await top50.listUpdate();
+                    break;
+            }
         }
 
         private void Timer_Tick(object sender, object e)
         {
             update();
         }
-
+        /// <summary>
+        /// 作品更新并显示
+        /// </summary>
         private async void update()
         {
             timer.Stop();
@@ -101,7 +124,7 @@ namespace Pixiv_Wallpaper_for_Win10
                 dialog.Content = "更换壁纸操作失败。";
                 await dialog.ShowAsync();
             }
-           
+
 
             timer.Interval = TimeSpan.FromMinutes(c.time);
             timer.Start();

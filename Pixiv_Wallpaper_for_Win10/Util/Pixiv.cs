@@ -26,7 +26,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             c = new Conf();
         }
 
-        public async Task<ArrayList> getRallist()                                      //获取top50
+        /// <summary>
+        /// 获取TOP 50推荐列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ArrayList> getRallist()
         {
             string rall;
             ArrayList list = new ArrayList();
@@ -56,6 +60,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return list;   
         }
 
+        /// <summary>
+        /// 图片信息查询子方法1(R18作品无法查询地址)
+        /// </summary>
+        /// <param name="imgid">要查找的作品ID</param>
+        /// <returns></returns>
         private async Task<string> getImageInfoSub1(string imgid)
         {
             HttpUtil info1 = new HttpUtil(DETA_URL+imgid, HttpUtil.Contype.JSON);
@@ -64,7 +73,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
             return data;
         }
-
+        /// <summary>
+        /// 图片信息查询子方法2
+        /// </summary>
+        /// <param name="imgid">要查找的作品ID</param>
+        /// <returns></returns>
         private async Task<string> getImageInfoSub2(string imgid)
         {
             HttpUtil info2 = new HttpUtil(ILLUST_URL + imgid + "&tt=" + c.token, HttpUtil.Contype.JSON);
@@ -75,7 +88,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return data;
         }
 
-
+        /// <summary>
+        /// 查询图片信息
+        /// </summary>
+        /// <param name="id">要查找的作品ID</param>
+        /// <returns></returns>
         public async Task<ImageInfo> getImageInfo(string id)
         {
             ImageInfo imginfo = null;
@@ -110,6 +127,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 imginfo.imgName = ill.title;
                 imginfo.tag = ill.tags.ToString();
 
+                //如为R18作品使用下面方法查询
                 if (imginfo.isR18)
                 {
                     string info2 = await getImageInfoSub2(id);
@@ -135,7 +153,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return imginfo;
         }
 
-
+        /// <summary>
+        /// 图片下载
+        /// </summary>
+        /// <param name="img">要下载的图片信息</param>
+        /// <returns></returns>
         public async Task<string> downloadImg(ImageInfo img)
         {
             Regex reg = new Regex("/c/[0-9]+x[0-9]+/img-master");

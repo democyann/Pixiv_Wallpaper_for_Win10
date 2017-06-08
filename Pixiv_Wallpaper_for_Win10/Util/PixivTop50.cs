@@ -19,6 +19,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             p = new Pixiv();
         }
 
+        /// <summary>
+        /// 作品类别更新
+        /// </summary>
+        /// <param name="flag">是否无视列表情况强制更新 默认为否</param>
+        /// <returns></returns>
         public async Task<ArrayList> listUpdate(bool flag = false)
         {
             if (results == null || results.Count <=0 || flag)
@@ -28,7 +33,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return results;
         }
 
-        public async Task<ImageInfo> SelectArtWork()                     //从数组中选取一个作品推送
+        /// <summary>
+        /// 作品推送
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ImageInfo> SelectArtWork()
         {
             await listUpdate();
 
