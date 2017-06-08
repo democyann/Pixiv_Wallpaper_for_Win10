@@ -20,6 +20,12 @@
                             <TextBlock Text="预览" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
+                    <Button FontSize="18" Height="50" Width="140" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark" x:Name="next_btn" Click="next_btn_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE0AB;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock Text="下一张" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                        </StackPanel>
+                    </Button>
                     <Button FontSize="18" Height="50" Width="140" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE71D;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
@@ -36,8 +42,6 @@
             </SplitView.Pane>
 
         </SplitView>
-        <Frame x:Name="main" Padding="40,0,0,0">
-
-        </Frame>
+        <Frame x:Name="main" Padding="40,0,0,0"/>
     </Grid>
 </Page>

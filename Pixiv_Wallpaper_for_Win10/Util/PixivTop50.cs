@@ -12,50 +12,46 @@ namespace Pixiv_Wallpaper_for_Win10.Util
     class PixivTop50
     {
         public static ArrayList results = new ArrayList();
-        public static string selected;
-        private ArrayList listUpdate()           
+        private Pixiv p;
+
+        public PixivTop50()
         {
-            Pixiv pixiv = new Pixiv();
-            if (results == null || results.Count > 0)
-            {
-                pixiv.getRallist();
-                JObject top50 = new JObject();
-                top50 = JObject.Parse(pixiv.rall);
-                IList<JToken> illist_id = top50["illist_id"].ToList();
-                foreach (JToken result in illist_id)
-                {
-                    PixivTop50 pixivTop50 = JsonConvert.DeserializeObject<PixivTop50>(result.ToString());
-                    results.Add(pixivTop50);
-                }
-                return results;
-            }
-            else
-                return results;
+            p = new Pixiv();
         }
-        public string SelectArtWork()                     //从数组中选取一个作品推送
+
+        public async Task<ArrayList> listUpdate(bool flag = false)
         {
-            if (results != null || results.Count > 0)
+            if (results == null || results.Count <=0 || flag)
             {
-                bool p = true;
-                while (p)
+                results = await p.getRallist();
+            }
+            return results;
+        }
+
+        public async Task<ImageInfo> SelectArtWork()                     //从数组中选取一个作品推送
+        {
+            await listUpdate();
+
+            ImageInfo img = null;
+            if (results != null && results.Count > 0)
+            {
+                while (true)
                 {
                     Random r = new Random();
                     int number = r.Next(0, 50);
                     if (results[number] != null)
                     {
-                        p = false;
-                        selected = results[number].ToString();
-                        results[number] = null;
-                        return selected;
+                        string imgid = results[number].ToString();
+                        img = await p.getImageInfo(imgid);                      
                     }
+                    break;
                 }
+
+                string path = await p.downloadImg(img);
+
             }
-            else
-            {
-                listUpdate();
-                return SelectArtWork();
-            }
+            return img;
         }
-        
+
     }
 }

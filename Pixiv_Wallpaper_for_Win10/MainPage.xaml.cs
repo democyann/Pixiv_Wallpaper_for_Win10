@@ -15,6 +15,8 @@ using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
 using Windows.Storage;
 using Pixiv_Wallpaper_for_Win10.Util;
+using System.Collections;
+using System.Threading;
 
 namespace Pixiv_Wallpaper_for_Win10
 {
@@ -24,30 +26,57 @@ namespace Pixiv_Wallpaper_for_Win10
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private DispatcherTimer timer;
+        private Conf c;
+        private PixivTop50 top50;
         public MainPage()
         {
             this.InitializeComponent();
+            c = new Conf();
+            top50 = new PixivTop50();
+
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMinutes(c.time);
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
             main.Navigate(typeof(ShowPage));
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private void Timer_Tick(object sender, object e)
+        {
+            update();
+        }
+
+        private async void update()
+        {
+            timer.Stop();
+
+            ImageInfo img;
+            switch (c.mode)
+            {
+                case "Top_50":
+                    img = await top50.SelectArtWork();
+                    break;
+                default:
+                    img = await top50.SelectArtWork();
+                    break;
+            }
+
+            if (img != null)
+            {
+                main.Navigate(typeof(ShowPage), img.userId + img.imgId);
+            }
+
+
+            timer.Interval = TimeSpan.FromMinutes(c.time);
+            timer.Start();
+        }
+
+
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             lis.IsPaneOpen = !lis.IsPaneOpen;
-
-            //============图片下载示例代码============
-
-            string url = "https://i.pximg.net/img-original/img/2016/02/29/23/44/55/55558612_p0.jpg";
-            string refurl = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=55558612";
-
-            HttpUtil test = new HttpUtil(url, HttpUtil.Contype.IMG);
-            test.referer = refurl;
-            string a = await test.ImageDownloadAsync("234234", "12333");
-
-            main.Navigate(typeof(ShowPage), a);
-
-            //==========================================
-
-
         }
 
         private void show_btn_Click(object sender, RoutedEventArgs e)
@@ -58,6 +87,11 @@ namespace Pixiv_Wallpaper_for_Win10
         private void setting_btn_Click(object sender, RoutedEventArgs e)
         {
             main.Navigate(typeof(SettingPage));
+        }
+
+        private void next_btn_Click(object sender, RoutedEventArgs e)
+        {
+            update();
         }
     }
 }
