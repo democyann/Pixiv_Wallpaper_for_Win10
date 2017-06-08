@@ -105,7 +105,9 @@
     <Compile Include="ShowPage.xaml.cs">
       <DependentUpon>ShowPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Util\Conf.cs" />
     <Compile Include="Util\HttpUtil.cs" />
+    <Compile Include="Util\ImageInfo.cs" />
     <Compile Include="Util\Pixiv.cs" />
     <Compile Include="Util\PixivTop50.cs" />
   </ItemGroup>

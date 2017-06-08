@@ -13,6 +13,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
+using Pixiv_Wallpaper_for_Win10.Util;
+using System.Collections.ObjectModel;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -24,9 +26,41 @@ namespace Pixiv_Wallpaper_for_Win10
     public sealed partial class SettingPage : Page
     {
         ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;  //获取本地应用设置容器(单例)
+
         public SettingPage()
         {
             this.InitializeComponent();
+            
+            //下拉框初始化
+            combox1.Items.Add(new KeyValuePair<string, int>("1 分钟", 1));
+            combox1.Items.Add(new KeyValuePair<string, int>("5 分钟", 5));
+            combox1.Items.Add(new KeyValuePair<string, int>("10 分钟", 10));
+            combox1.Items.Add(new KeyValuePair<string, int>("15 分钟", 15));
+            combox1.Items.Add(new KeyValuePair<string, int>("30 分钟", 30));
+            combox1.Items.Add(new KeyValuePair<string, int>("60 分钟", 60));
+
+            //值填充
+            Conf c = new Conf();
+
+            combox1.SelectedValue = c.time;
+
+            switch (c.mode)
+            {
+                case "Top_50":
+                    radiobutton2.IsChecked = true;
+                    break;
+                case "You_Like":
+                    radiobutton1.IsChecked = true;
+                    break;
+                default:
+                    radiobutton2.IsChecked = true;
+                    break;
+            }
+
+            textbox1.Text = c.account;
+            passwordbox1.Password = c.password;
+
+
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -39,6 +73,7 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 localSettings.Values["Mode"] = "Top_50";         //设置本地保存文件（模式）为TOP50
             }
+
             localSettings.Values["Account"] = textbox1.Text;     //保存账号
             localSettings.Values["Password"] = passwordbox1.Password;    //保存密码
             localSettings.Values["Time"] = combox1.SelectedValue;    //保存时间

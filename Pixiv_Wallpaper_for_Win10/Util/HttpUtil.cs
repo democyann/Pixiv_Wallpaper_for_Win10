@@ -33,6 +33,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             "image/webp,image/apng,image/*,*/*;q=0.8"
         };
 
+        private static readonly String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+
 
         private string url;
         private Contype dataType;
@@ -69,24 +71,25 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Method = "GET";
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
+            request.Headers["User-Agent"] = USER_AGENT;
             if (referer != null)
             {
                 request.Headers["Referer"] = referer;
             }
             HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-            Task<string> res = new Task<string>(() => { return "ERROR"; });
+            string res = "Error";
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 Stream s = response.GetResponseStream();
                 StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
-                res = sr.ReadToEndAsync();
+                res = await sr.ReadToEndAsync();
                 cookie = response.Headers["Set-Cookie"];
 
                 sr.Dispose();
                 s.Dispose();
             }
             response.Dispose();
-            return await res;
+            return res;
         }
         /// <summary>
         /// HTTP POST 请求
@@ -100,6 +103,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Method = "POST";
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
+            request.Headers["User-Agent"] = USER_AGENT;
             if (referer != null)
             {
                 request.Headers["Referer"] = referer;
@@ -110,12 +114,12 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             write.Dispose();
 
             HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-            Task<string> res = new Task<string>(() => { return "ERROR"; });
+            string res = "ERROR";
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 Stream s = response.GetResponseStream();
                 StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
-                res = sr.ReadToEndAsync();
+                res = await sr.ReadToEndAsync();
                 cookie = response.Headers["Set-Cookie"];
 
                 sr.Dispose();
@@ -124,7 +128,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             response.Dispose();
 
-            return await res;
+            return res;
         }
 
         public async Task<string> ImageDownloadAsync(string userid, string imgid)
@@ -136,8 +140,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Headers["Referer"] = referer;
 
             HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-
-            //Task<string> res = new Task<string>(() => { return "ERROR"; });
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -156,21 +158,15 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                        await write.WriteAsync(temp, 0, l);
                     }
                     a += l;
-                    //Debug.WriteLine(l);
-                    //Debug.WriteLine("SUM"+a);
+
                 } while (l > 0);
 
-                //int a;
-                //while ((a = s.ReadByte()) != -1)
-                //{
-                //    write.WriteByte((byte)a);
-                //}e
-                //await write.FlushAsync();
-
-
-                await write.FlushAsync();
                 write.Dispose();
                 s.Dispose();
+            }
+            else
+            {
+                return "ERROR";
             }
 
             response.Dispose();
