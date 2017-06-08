@@ -56,7 +56,7 @@ namespace Pixiv_Wallpaper_for_Win10
                     radiobutton2.IsChecked = true;
                     break;
             }
-
+            lock_che.IsChecked = c.lockscr;
             textbox1.Text = c.account;
             passwordbox1.Password = c.password;
 
@@ -73,7 +73,7 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 localSettings.Values["Mode"] = "Top_50";         //设置本地保存文件（模式）为TOP50
             }
-
+            localSettings.Values["Lock"] = lock_che.IsChecked;
             localSettings.Values["Account"] = textbox1.Text;     //保存账号
             localSettings.Values["Password"] = passwordbox1.Password;    //保存密码
             localSettings.Values["Time"] = combox1.SelectedValue;    //保存时间

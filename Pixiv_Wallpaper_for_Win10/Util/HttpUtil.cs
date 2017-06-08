@@ -144,7 +144,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 Stream s = response.GetResponseStream();
-                StorageFile file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(userid + imgid, CreationCollisionOption.ReplaceExisting);
+                StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(userid + imgid, CreationCollisionOption.ReplaceExisting);
 
                 Stream write = await file.OpenStreamForWriteAsync();
                 int l;

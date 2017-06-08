@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -83,6 +85,21 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
         }
 
+        public bool lockscr
+        {
+            get
+            {
+                if (localSettings.Values["Lock"] == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return Convert.ToBoolean(localSettings.Values["Lock"]);
+                }
+            }
+        }
+
         /// <summary>
         /// 获取或设置 token
         /// </summary>
@@ -124,6 +141,26 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             set
             {
                 localSettings.Values["cookie"] = value;
+            }
+        }
+
+        public ImageInfo lastImg
+        {
+            get
+            {
+                if (localSettings.Values["lastImg"] == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    ImageInfo i = JsonConvert.DeserializeObject<ImageInfo>(localSettings.Values["lastImg"].ToString());
+                    return i;
+                }
+            }
+            set
+            {
+                localSettings.Values["lastImg"] = JsonConvert.SerializeObject(value);
             }
         }
     }

@@ -15,7 +15,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
-
+using Pixiv_Wallpaper_for_Win10.Util;
 
 namespace Pixiv_Wallpaper_for_Win10
 {
@@ -25,19 +25,29 @@ namespace Pixiv_Wallpaper_for_Win10
     /// </summary>
     public sealed partial class ShowPage : Page
     {
+
+        private Conf c;
         public ShowPage()
         {
             this.InitializeComponent();
-            show_img.Source = new BitmapImage(new Uri("ms-appx:///Res/62258773_p0.png"));
-        }
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            if (e.Parameter != null)
+            c = new Conf();
+            if (c.lastImg == null)
             {
-                Debug.WriteLine(e.Parameter.ToString());
-                show_img.Source = new BitmapImage(new Uri("ms-appdata:///temp/" + e.Parameter.ToString()));
+                show_img.Source = new BitmapImage(new Uri("ms-appx:///Res/62258773_p0.png"));
+            }
+            else
+            {
+                show_img.Source = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.userId+c.lastImg.imgId));
             }
         }
+
+        //protected override void OnNavigatedTo(NavigationEventArgs e)
+        //{
+        //    if (e.Parameter != null)
+        //    {
+        //        Debug.WriteLine(e.Parameter.ToString());
+        //        show_img.Source = new BitmapImage(new Uri("ms-appdata:///temp/" + e.Parameter.ToString()));
+        //    }
+        //}
     }
 }
