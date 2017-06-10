@@ -38,9 +38,14 @@
                             <TextBlock Text="设置" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                         </StackPanel>
                     </Button>
+                    <Button x:Name="visiturl_button" FontSize="18" VerticalAlignment="Bottom" Height="50" Width="140" HorizontalContentAlignment="Left" Margin="0" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark" Click="visiturl_btn_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE167;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock Text="访问网页" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </SplitView.Pane>
-
         </SplitView>
         <Frame x:Name="main" Padding="40,0,0,0"/>
     </Grid>

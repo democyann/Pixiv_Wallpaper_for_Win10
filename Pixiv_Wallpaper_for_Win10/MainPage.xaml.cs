@@ -33,6 +33,8 @@ namespace Pixiv_Wallpaper_for_Win10
 
         private Conf c;
         private PixivTop50 top50;
+        private PixivLike like;
+        private ImageInfo img;
 
         public MainPage()
         {
@@ -59,10 +61,13 @@ namespace Pixiv_Wallpaper_for_Win10
             switch (c.mode)
             {
                 case "Top_50":
-                    await top50.listUpdate();
+                    await top50.listUpdate(true);
+                    break;
+                case "You_Like":
+                    await like.ListUpdate(true);
                     break;
                 default:
-                    await top50.listUpdate();
+                    await top50.listUpdate(true);
                     break;
             }
         }
@@ -84,6 +89,9 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 case "Top_50":
                     img = await top50.SelectArtWork();
+                    break;
+                case "You_Like":
+                    img = await like.SelectArtWork();
                     break;
                 default:
                     img = await top50.SelectArtWork();
@@ -131,24 +139,30 @@ namespace Pixiv_Wallpaper_for_Win10
         }
 
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)     //汉堡界面开关
         {
             lis.IsPaneOpen = !lis.IsPaneOpen;
         }
 
-        private void show_btn_Click(object sender, RoutedEventArgs e)
+        private void show_btn_Click(object sender, RoutedEventArgs e)   //展示页面按钮
         {
             main.Navigate(typeof(ShowPage));
         }
 
-        private void setting_btn_Click(object sender, RoutedEventArgs e)
+        private void setting_btn_Click(object sender, RoutedEventArgs e) //设置界面按钮
         {
             main.Navigate(typeof(SettingPage));
         }
 
-        private void next_btn_Click(object sender, RoutedEventArgs e)
+        private void next_btn_Click(object sender, RoutedEventArgs e)    //下一张图
         {
             update();
+        }
+
+        private async void visiturl_btn_Click(object sender, RoutedEventArgs e)       //访问p站
+        {
+            var uriPixiv = new Uri(@"https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + img.imgId);
+            var visit = await Windows.System.Launcher.LaunchUriAsync(uriPixiv);
         }
     }
 }

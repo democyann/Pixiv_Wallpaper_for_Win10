@@ -59,7 +59,37 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             return list;   
         }
+        /// <summary>
+        /// 获取"猜你喜欢"推荐列表
+        /// </summary>
+        /// <returns></returns>
 
+        public async Task<ArrayList> getRecommlist()
+        {
+            string like;
+            ArrayList list = new ArrayList();
+            HttpUtil recomm = new HttpUtil(RECOMM_URL, HttpUtil.Contype.JSON);
+
+            like =await recomm.PostDataAsync();
+            Debug.WriteLine(like);
+            if (like != "ERROR")
+            {
+                dynamic o = JObject.Parse(like);
+                JArray arr = o.contents;
+                if (arr.Count > 0)
+                {
+                    foreach (JToken t in arr)
+                    {
+                        list.Add(t["illust_id"].ToString());
+                        Debug.WriteLine(t["illust_id"].ToString());
+                        return list;
+                    }
+                }
+            }
+            else
+                Debug.WriteLine("ERROR");
+            return list;
+        }
         /// <summary>
         /// 图片信息查询子方法1(R18作品无法查询地址)
         /// </summary>

@@ -56,7 +56,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     break;
                 }
 
-                string path = await p.downloadImg(img);
+                await p.downloadImg(img);
 
             }
             return img;
