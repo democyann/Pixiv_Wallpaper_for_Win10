@@ -17,10 +17,14 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         private readonly String POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh&source=pc&view_type=page&ref=wwwtop_accounts_index";
         private readonly String LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=zh";
         private readonly String RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=500&tt=";
-        private readonly String ILLUST_URL="https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
-        private readonly String DETA_URL="https://app-api.pixiv.net/v1/illust/detail?illust_id=";
-        private readonly String RALL_URL="https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
+        private readonly String ILLUST_URL = "https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
+        private readonly String DETA_URL = "https://app-api.pixiv.net/v1/illust/detail?illust_id=";
+        private readonly String RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
         private Conf c;
+
+        public string cookie { get; set; }
+        public string token { get; set; }
+
         public Pixiv()
         {
             c = new Conf();
@@ -45,20 +49,89 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 dynamic o = JObject.Parse(rall);
                 JArray arr = o.contents;
 
-                if (arr.Count > 0)
+                foreach (JToken j in arr)
                 {
-                    foreach (JToken j in arr) {
-                        list.Add(j["illust_id"].ToString());
-                        Debug.WriteLine(j["illust_id"].ToString());                       
-                    }
+                    list.Add(j["illust_id"].ToString());
+                    Debug.WriteLine(j["illust_id"].ToString());
                 }
             }
             else
             {
                 Debug.WriteLine("ERROR");
             }
-            return list;   
+            return list;
         }
+
+        private async Task<string> postKey()
+        {
+            string key = "";
+            //获取POST KEY
+
+            HttpUtil posturl = new HttpUtil(POST_KEY_URL, HttpUtil.Contype.HTML);
+            string poststr = await posturl.GetDataAsync();
+            if (!posturl.Equals("ERROR"))
+            {
+                Regex r = new Regex("name=\"post_key\"\\svalue=\"([a-z0-9]{32})\"", RegexOptions.Singleline);
+                if (r.IsMatch(poststr))
+                {
+                    key = r.Match(poststr).Groups[1].ToString();
+                    cookie = posturl.cookie;
+                }
+            }
+            Debug.WriteLine("POST KEY:" + key);
+            return key;
+        }
+
+        private async Task<bool> login()
+        {
+            bool f = false;
+            string postkey = await postKey();
+            HttpUtil loginurl = new HttpUtil(LOGIN_URL, HttpUtil.Contype.JSON);
+            loginurl.cookie = cookie;
+            string pram = "pixiv_id=" + c.account
+                        + "&password=" + c.password
+                        + "&captcha=&g_recaptcha_response=&post_key=" + postkey
+                        + "&source=pc&ref=wwwtop_accounts_index&return_to=http://www.pixiv.net/";
+
+            string data = await loginurl.PostDataAsync(pram);
+
+            if (!data.Equals("ERROR"))
+            {
+                dynamic o = JObject.Parse(data);
+                if (o.body.success != null)
+                {
+                    cookie = loginurl.cookie;
+                    f = true;
+                }
+            }
+
+            return f;
+        }
+
+        public async Task<bool> getToken(bool flag = false)
+        {
+            bool f = false;
+            if (flag)
+            {
+                if (!await login()) return f;
+            }
+
+            HttpUtil tokurl = new HttpUtil(INDEX_URL, HttpUtil.Contype.HTML);
+            tokurl.cookie = cookie;
+            string data = await tokurl.GetDataAsync();
+            if (!data.Equals("ERROR"))
+            {
+                Regex r = new Regex("pixiv.context.token\\s=\\s\"([a-z0-9]{32})\"");
+                if (r.IsMatch(data))
+                {
+                    token = r.Match(data).Groups[1].ToString();
+                    Debug.WriteLine("TOKEN:" + token);
+                    f = true;
+                }
+            }
+            return f;
+        }
+
         /// <summary>
         /// 获取"猜你喜欢"推荐列表
         /// </summary>
@@ -69,62 +142,25 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             string like;
             ArrayList list = new ArrayList();
             HttpUtil recomm = new HttpUtil(RECOMM_URL, HttpUtil.Contype.JSON);
+            recomm.cookie = cookie;
 
-            string Token;
-            Token=await recomm.PostDataAsync(key);
             like = await recomm.GetDataAsync();
+
             Debug.WriteLine(like);
+
             if (like != "ERROR")
             {
                 dynamic o = JObject.Parse(like);
-                JArray arr = o.contents;
-                if (arr.Count > 0)
+                JArray arr = o.recommendations;
+                foreach(JToken j in arr)
                 {
-                    foreach (JToken t in arr)
-                    {
-                        list.Add(t["illust_id"].ToString());
-                        Debug.WriteLine(t["illust_id"].ToString());
-                        return list;
-                    }
+                    list.Add(j.ToString());
+                    Debug.WriteLine(j.ToString());
                 }
             }
             else
                 Debug.WriteLine("ERROR");
             return list;
-        }
-        /// <summary>
-        /// 获取高宽比值并用泛型存储
-        /// </summary>
-        public async Task<Dictionary<string,double>> getWHratio()      
-        {
-            string WH;
-            Dictionary<string,double>dic = new Dictionary<string, double>();
-            HttpUtil recomm = new HttpUtil(RECOMM_URL, HttpUtil.Contype.JSON);
-
-            WH = await recomm.GetDataAsync();
-            Debug.WriteLine(WH);
-            if (WH != "ERROR")
-            {
-                dynamic o = JObject.Parse(WH);
-                JArray arr = o.contents;
-                if (arr.Count > 0)
-                {
-                    foreach (JToken t in arr)
-                    {
-                        string width = t["width"].ToString();
-                        string height = t["height"].ToString();
-                        double A = Convert.ToDouble(width);
-                        double B = Convert.ToDouble(height);
-                        double WHratio = A / B;
-                        dic.Add(t["illust_id"].ToString(),WHratio);
-                        Debug.WriteLine(t["illust_id"].ToString()+WHratio);
-                        return dic;
-                    }
-                }
-            }
-            else
-                Debug.WriteLine("ERROR");
-            return dic;
         }
         /// <summary>
         /// 图片信息查询子方法1(R18作品无法查询地址)
@@ -133,7 +169,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <returns></returns>
         private async Task<string> getImageInfoSub1(string imgid)
         {
-            HttpUtil info1 = new HttpUtil(DETA_URL+imgid, HttpUtil.Contype.JSON);
+            HttpUtil info1 = new HttpUtil(DETA_URL + imgid, HttpUtil.Contype.JSON);
             string data = await info1.GetDataAsync();
             Debug.WriteLine(data);
 
@@ -146,7 +182,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <returns></returns>
         private async Task<string> getImageInfoSub2(string imgid)
         {
-            HttpUtil info2 = new HttpUtil(ILLUST_URL + imgid + "&tt=" + c.token, HttpUtil.Contype.JSON);
+            HttpUtil info2 = new HttpUtil(ILLUST_URL + imgid + "&tt=" + token, HttpUtil.Contype.JSON);
             info2.cookie = c.cookie;
             string data = await info2.GetDataAsync();
             Debug.WriteLine(data);
@@ -165,17 +201,17 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             string info1 = await getImageInfoSub1(id);
             if (!info1.Equals("ERROR"))
             {
-                imginfo=new ImageInfo();
+                imginfo = new ImageInfo();
 
                 dynamic o = JObject.Parse(info1);
                 dynamic ill = o.illust;
                 dynamic imgurl;
-                imginfo.viewCount =(int)ill.total_view;
+                imginfo.viewCount = (int)ill.total_view;
 
                 if ((int)ill.page_count > 1)
                 {
                     imgurl = ill.meta_pages[0].image_urls;
-                    imginfo.imgUrl=imgurl.original;
+                    imginfo.imgUrl = imgurl.original;
                 }
                 else
                 {
@@ -192,6 +228,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 imginfo.imgId = ill.id;
                 imginfo.imgName = ill.title;
                 imginfo.tag = ill.tags.ToString();
+                imginfo.height = (int)ill.height;
+                imginfo.width = (int)ill.width;
 
                 //如为R18作品使用下面方法查询
                 if (imginfo.isR18)
@@ -200,7 +238,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     if (!info2.Equals("ERROR"))
                     {
                         dynamic d = JObject.Parse(info2);
-                        imginfo.userId= d.illust_user_id;
+                        imginfo.userId = d.illust_user_id;
                         imginfo.imgId = d.illust_id;
                         imginfo.imgUrl = d.url;
                         imginfo.userName = d.user_name;
@@ -227,38 +265,14 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         public async Task<string> downloadImg(ImageInfo img)
         {
             Regex reg = new Regex("/c/[0-9]+x[0-9]+/img-master");
-            img.imgUrl=reg.Replace(img.imgUrl, "/img-master", 1);
+            img.imgUrl = reg.Replace(img.imgUrl, "/img-master", 1);
 
-            HttpUtil download = new HttpUtil(img.imgUrl,HttpUtil.Contype.IMG);
+            HttpUtil download = new HttpUtil(img.imgUrl, HttpUtil.Contype.IMG);
             download.referer = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + img.imgId;
             download.cookie = c.cookie;
             string path = await download.ImageDownloadAsync(img.userId, img.imgId);
             return path;
         }
 
-
-
-        //public async void getrecomm()                                      //获取推荐（登陆后操作）
-        //{
-        //    HttpUtil recomm = new HttpUtil(RECOMM_URL, HttpUtil.Contype.JSON);
-        //    ulike = await recomm.GetDataAsync(); 
-        //}
-        //public async void getIllInfo(String id)
-        //{
-        //    HttpUtil info = new HttpUtil(DETA_URL, HttpUtil.Contype.JSON);
-        //    IllInfo = await info.GetDataAsync();
-        //}
-
-
-        // 这个不需要
-        //public void ModeSelect()             //模式选取(未完成）
-        //{
-        //    String mode = localSettings.Values["Mode"].ToString();      
-        //    if (mode == "Top_50")
-        //    {
-        //        p.SelectArtWork();
-        //    }
-                
-        //}
     }
 }

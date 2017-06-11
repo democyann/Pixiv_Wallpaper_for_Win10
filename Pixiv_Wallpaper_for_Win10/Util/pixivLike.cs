@@ -13,9 +13,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
     {
         private ArrayList like = new ArrayList();
         Pixiv pixiv;
+        Conf c;
         public PixivLike()
         {
             pixiv = new Pixiv();
+            c = new Conf();
         }
         public async Task<ArrayList>  ListUpdate(bool flag=false)
         {
@@ -27,6 +29,25 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         }
         public async Task<ImageInfo> SelectArtWork()
         {
+            if(c.account.Equals("")|| c.password.Equals(""))
+            {
+                return null;
+            }
+
+            if (pixiv.token == null || pixiv.token.Equals(""))
+            {
+                if (c.token.Equals(""))
+                {
+                    if (!await pixiv.getToken(true))
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            c.cookie = pixiv.cookie;
+            c.token = pixiv.token;
+
             await ListUpdate();
             ImageInfo img = null;
             if(like!=null&&like.Count!=0)
@@ -35,10 +56,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     Random r = new Random();
                     int number=r.Next(0, 50);
-                    bool b = await Ratio(like[number].ToString());       //加入高宽比判断
-                    if (like[number]!=null&&b)
+                    if(like[number]!=null)
                     {
-                        
                         string id=like[number].ToString();
                         img =await pixiv.getImageInfo(id);
                     }
@@ -47,18 +66,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 await pixiv.downloadImg(img);
             }
             return img;
-        }
-        /// <summary>
-        /// 高宽比判断
-        /// </summary>
-        private async Task<Boolean> Ratio(string id)
-        {
-            Dictionary<string, double> wh;
-            wh=await pixiv.getWHratio();
-            if (wh[id] > 1.5)                       //呆萌可以考虑改一个更合适的值？
-                return true;
-            else
-                return false;
         }
     }
 }

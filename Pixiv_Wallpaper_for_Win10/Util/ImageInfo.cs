@@ -44,5 +44,33 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// </summary>
         public int viewCount { get; set; }
 
+        /// <summary>
+        /// 图片宽度
+        /// </summary>
+        public int width { get; set; }
+
+        /// <summary>
+        /// 图片高度
+        /// </summary>
+        public int height { get; set; }
+
+        /// <summary>
+        /// 图片宽高比
+        /// </summary>
+        public double WHratio
+        {
+            get
+            {
+                if (width == 0 || height == 0)
+                {
+                    return 0.5;
+                }
+                else
+                {
+                    return width * 1.0 / height;
+                }
+            }
+        }
+
     }
 }

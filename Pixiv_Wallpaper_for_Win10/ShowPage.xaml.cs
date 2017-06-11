@@ -38,11 +38,15 @@ namespace Pixiv_Wallpaper_for_Win10
             }
             else
             {
+                img = c.lastImg;
+
                 show_img.Source = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.userId+c.lastImg.imgId));
+
+                textBlock1.Text = img.imgName;
+                textBlock2.Text = img.userName;
+                textBlock3.Text = (img.viewCount + "次浏览");
             }
-            textBlock1.Text = img.imgName;
-            textBlock2.Text = img.userName;
-            textBlock3.Text = (img.viewCount + "次浏览");
+
         }
 
         //protected override void OnNavigatedTo(NavigationEventArgs e)
