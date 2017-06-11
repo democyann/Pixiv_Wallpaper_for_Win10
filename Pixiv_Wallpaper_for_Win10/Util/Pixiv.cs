@@ -93,12 +93,12 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return list;
         }
         /// <summary>
-        /// 获取高宽比数据
+        /// 获取高宽比值并用泛型存储
         /// </summary>
-        public async Task<Dictionary<string,string>> getWHratio()      
+        public async Task<Dictionary<string,double>> getWHratio()      
         {
             string WH;
-            Dictionary<string,string>dic = new Dictionary<string, string>();
+            Dictionary<string,double>dic = new Dictionary<string, double>();
             HttpUtil recomm = new HttpUtil(RECOMM_URL, HttpUtil.Contype.JSON);
 
             WH = await recomm.GetDataAsync();
@@ -111,8 +111,13 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     foreach (JToken t in arr)
                     {
-                        dic.Add(t["illust_id"].ToString(),t["width"].ToString()+'p'+t["height"].ToString());
-                        Debug.WriteLine(t["illust_id"].ToString()+'p'+ t["height"].ToString());
+                        string width = t["width"].ToString();
+                        string height = t["height"].ToString();
+                        double A = Convert.ToDouble(width);
+                        double B = Convert.ToDouble(height);
+                        double WHratio = A / B;
+                        dic.Add(t["illust_id"].ToString(),WHratio);
+                        Debug.WriteLine(t["illust_id"].ToString()+WHratio);
                         return dic;
                     }
                 }

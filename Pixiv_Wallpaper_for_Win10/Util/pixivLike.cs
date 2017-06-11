@@ -35,8 +35,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     Random r = new Random();
                     int number=r.Next(0, 50);
-                    if(like[number]!=null)
+                    bool b = await Ratio(like[number].ToString());       //加入高宽比判断
+                    if (like[number]!=null&&b)
                     {
+                        
                         string id=like[number].ToString();
                         img =await pixiv.getImageInfo(id);
                     }
@@ -49,8 +51,14 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <summary>
         /// 高宽比判断
         /// </summary>
-        private async Task<Boolean> WHratio(string id)
+        private async Task<Boolean> Ratio(string id)
         {
+            Dictionary<string, double> wh;
+            wh=await pixiv.getWHratio();
+            if (wh[id] > 1.5)                       //呆萌可以考虑改一个更合适的值？
+                return true;
+            else
+                return false;
         }
     }
 }
