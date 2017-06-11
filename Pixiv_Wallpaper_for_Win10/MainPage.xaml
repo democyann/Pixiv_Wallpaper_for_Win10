@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid x:Name="gr" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <SplitView  OpenPaneLength="140" IsPaneOpen="false" x:Name="lis" DisplayMode="CompactOverlay" CompactPaneLength="40" Canvas.ZIndex="1">
             <SplitView.Pane>
                 <StackPanel Height="auto" Background="#FF006AB4">

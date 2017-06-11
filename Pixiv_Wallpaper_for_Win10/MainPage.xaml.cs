@@ -19,6 +19,7 @@ using System.Collections;
 using System.Threading;
 using Windows.System.UserProfile;
 using Windows.UI.Popups;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Pixiv_Wallpaper_for_Win10
 {
@@ -52,6 +53,13 @@ namespace Pixiv_Wallpaper_for_Win10
             li_uptimer.Interval = TimeSpan.FromHours(1);
             li_uptimer.Tick += Li_uptimer_Tick;
             li_uptimer.Start();
+
+            ImageBrush br = new ImageBrush();
+            br.Stretch = Stretch.UniformToFill;
+            br.AlignmentX = AlignmentX.Left;
+            br.AlignmentY = AlignmentY.Top;
+            br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.userId + c.lastImg.imgId));
+            gr.Background = br;
 
             main.Navigate(typeof(ShowPage));
         }
@@ -133,7 +141,13 @@ namespace Pixiv_Wallpaper_for_Win10
                 dialog.Content = "更换壁纸操作失败。";
                 await dialog.ShowAsync();
             }
-
+            ImageBrush br = new ImageBrush();
+            br.Stretch = Stretch.UniformToFill;
+            br.AlignmentX = AlignmentX.Left;
+            br.AlignmentY = AlignmentY.Top;
+            br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.userId + c.lastImg.imgId));
+            
+            gr.Background = br;
 
             timer.Interval = TimeSpan.FromMinutes(c.time);
             timer.Start();
