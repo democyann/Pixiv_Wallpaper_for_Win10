@@ -41,6 +41,7 @@ namespace Pixiv_Wallpaper_for_Win10
             this.InitializeComponent();
             c = new Conf();
             top50 = new PixivTop50();
+            like = new PixivLike();
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMinutes(c.time);
@@ -84,7 +85,7 @@ namespace Pixiv_Wallpaper_for_Win10
             timer.Stop();
             var dialog = new MessageDialog("");
 
-            ImageInfo img;
+            //ImageInfo img;
             switch (c.mode)
             {
                 case "Top_50":
