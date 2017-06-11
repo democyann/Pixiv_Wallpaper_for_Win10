@@ -46,5 +46,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             return img;
         }
+        /// <summary>
+        /// 高宽比判断
+        /// </summary>
+        private async Task<Boolean> WHratio(string id)
+        {
+        }
     }
 }

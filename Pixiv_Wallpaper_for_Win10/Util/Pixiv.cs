@@ -70,7 +70,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             ArrayList list = new ArrayList();
             HttpUtil recomm = new HttpUtil(RECOMM_URL, HttpUtil.Contype.JSON);
 
-            like =await recomm.PostDataAsync();
+            string Token;
+            Token=await recomm.PostDataAsync(key);
+            like = await recomm.GetDataAsync();
             Debug.WriteLine(like);
             if (like != "ERROR")
             {
@@ -89,6 +91,35 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             else
                 Debug.WriteLine("ERROR");
             return list;
+        }
+        /// <summary>
+        /// 获取高宽比数据
+        /// </summary>
+        public async Task<Dictionary<string,string>> getWHratio()      
+        {
+            string WH;
+            Dictionary<string,string>dic = new Dictionary<string, string>();
+            HttpUtil recomm = new HttpUtil(RECOMM_URL, HttpUtil.Contype.JSON);
+
+            WH = await recomm.GetDataAsync();
+            Debug.WriteLine(WH);
+            if (WH != "ERROR")
+            {
+                dynamic o = JObject.Parse(WH);
+                JArray arr = o.contents;
+                if (arr.Count > 0)
+                {
+                    foreach (JToken t in arr)
+                    {
+                        dic.Add(t["illust_id"].ToString(),t["width"].ToString()+'p'+t["height"].ToString());
+                        Debug.WriteLine(t["illust_id"].ToString()+'p'+ t["height"].ToString());
+                        return dic;
+                    }
+                }
+            }
+            else
+                Debug.WriteLine("ERROR");
+            return dic;
         }
         /// <summary>
         /// 图片信息查询子方法1(R18作品无法查询地址)
