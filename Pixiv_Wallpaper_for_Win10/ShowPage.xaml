@@ -8,6 +8,18 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Image x:Name="show_img"></Image>
+        <Grid.RowDefinitions>
+                <RowDefinition Height="6*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+        <Image x:Name="show_img" Grid.Column="0" Grid.ColumnSpan="2"></Image>
+        <Canvas Grid.Row="1" Opacity="0.6" Background="Black">
+        </Canvas>
+        <StackPanel Grid.Row="1">
+            <TextBlock Name="textBlock1" FontSize="36" Foreground="White" />
+            <TextBlock Name="textBlock2" FontSize="28" Foreground="White" />
+        </StackPanel>
+        <TextBlock Grid.Row="1" Name="textBlock3" HorizontalAlignment="Right" 
+                   Foreground="White" VerticalAlignment="Center" FontSize="32" Margin="0,0,30,0"/>
     </Grid>
 </Page>
