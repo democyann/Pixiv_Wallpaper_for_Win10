@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using System.Diagnostics;
+using System.IO.Compression;
 
 namespace Pixiv_Wallpaper_for_Win10.Util
 {
@@ -71,6 +72,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Method = "GET";
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
+            request.Headers["Accept-Encoding"] = "gzip,deflate,sdch";
             request.Headers["User-Agent"] = USER_AGENT;
             if (referer != null)
             {
@@ -81,6 +83,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 Stream s = response.GetResponseStream();
+                if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                {
+                    s = new GZipStream(s, CompressionMode.Decompress);
+                }
                 StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
                 res = await sr.ReadToEndAsync();
                 cookie = response.Headers["Set-Cookie"];
@@ -103,7 +109,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Method = "POST";
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
+            request.Headers["Accept-Encoding"] = "gzip,deflate,sdch";
             request.Headers["User-Agent"] = USER_AGENT;
+            request.ContentType = "application/x-www-form-urlencoded";
             if (referer != null)
             {
                 request.Headers["Referer"] = referer;
@@ -118,6 +126,12 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 Stream s = response.GetResponseStream();
+
+                if(response.Headers["Content-Encoding"]!=null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                {
+                    s = new GZipStream(s, CompressionMode.Decompress);
+                }
+
                 StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
                 res = await sr.ReadToEndAsync();
                 cookie = response.Headers["Set-Cookie"];

@@ -47,13 +47,13 @@ namespace Pixiv_Wallpaper_for_Win10
             switch (c.mode)
             {
                 case "Top_50":
-                    radiobutton2.IsChecked = true;
-                    break;
-                case "You_Like":
                     radiobutton1.IsChecked = true;
                     break;
-                default:
+                case "You_Like":
                     radiobutton2.IsChecked = true;
+                    break;
+                default:
+                    radiobutton1.IsChecked = true;
                     break;
             }
             lock_che.IsChecked = c.lockscr;
@@ -65,11 +65,11 @@ namespace Pixiv_Wallpaper_for_Win10
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            if (radiobutton1.IsChecked == true)
+            if (radiobutton2.IsChecked == true)
             {
                 localSettings.Values["Mode"] = "You_Like";        //设置本地保存文件（模式）为猜你喜欢
             }
-            if (radiobutton2.IsChecked == true)
+            if (radiobutton1.IsChecked == true)
             {
                 localSettings.Values["Mode"] = "Top_50";         //设置本地保存文件（模式）为TOP50
             }
