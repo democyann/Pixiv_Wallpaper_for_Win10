@@ -141,8 +141,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         {
             string like;
             ArrayList list = new ArrayList();
-            HttpUtil recomm = new HttpUtil(RECOMM_URL, HttpUtil.Contype.JSON);
+            HttpUtil recomm = new HttpUtil(RECOMM_URL+token, HttpUtil.Contype.JSON);
             recomm.cookie = cookie;
+            recomm.referer = "http://www.pixiv.net/recommended.php";
 
             like = await recomm.GetDataAsync();
 
