@@ -62,6 +62,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return list;
         }
 
+        /// <summary>
+        /// 获取POST KEY 私有方法
+        /// </summary>
+        /// <returns>POST KEY</returns>
         private async Task<string> postKey()
         {
             string key = "";
@@ -82,6 +86,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return key;
         }
 
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <returns>true 登录成功 false 登录失败</returns>
         private async Task<bool> login()
         {
             bool f = false;
@@ -108,6 +116,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return f;
         }
 
+        /// <summary>
+        /// 获取Token
+        /// </summary>
+        /// <param name="flag">true 登录获取，false 不登录获取</param>
+        /// <returns></returns>
         public async Task<bool> getToken(bool flag = false)
         {
             bool f = false;

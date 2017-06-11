@@ -42,11 +42,21 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     {
                         return null;
                     }
+                    else
+                    {
+                        c.cookie = pixiv.cookie;
+                        c.token = pixiv.token;
+                    }
+                }
+                else
+                {
+                    pixiv.cookie = c.cookie;
+                    pixiv.token = c.token;
                 }
             }
+            
 
-            c.cookie = pixiv.cookie;
-            c.token = pixiv.token;
+            
 
             await ListUpdate();
             ImageInfo img = null;
