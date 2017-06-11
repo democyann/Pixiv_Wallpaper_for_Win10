@@ -12,8 +12,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
     class PixivLike
     {
         private ArrayList like = new ArrayList();
-        Pixiv pixiv;
-        Conf c;
+        private Pixiv pixiv=new Pixiv();
+        private Conf c=new Conf();
+        private ImageInfo img=new ImageInfo();
         public PixivLike()
         {
             pixiv = new Pixiv();
@@ -66,7 +67,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     Random r = new Random();
                     int number=r.Next(0, 50);
-                    if(like[number]!=null)
+                    if(like[number]!=null&& img.WHratio>1.5)
                     {
                         string id=like[number].ToString();
                         img =await pixiv.getImageInfo(id);
