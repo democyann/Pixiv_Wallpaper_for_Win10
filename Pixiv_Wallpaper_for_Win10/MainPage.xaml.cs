@@ -79,6 +79,8 @@ namespace Pixiv_Wallpaper_for_Win10
                     await top50.listUpdate(true);
                     break;
             }
+            li_uptimer.Interval = TimeSpan.FromHours(1);
+            li_uptimer.Start();
         }
 
         private void Timer_Tick(object sender, object e)
@@ -121,7 +123,16 @@ namespace Pixiv_Wallpaper_for_Win10
                 return;
             }
             UserProfilePersonalizationSettings settings = UserProfilePersonalizationSettings.Current;
-            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + c.lastImg.userId + c.lastImg.imgId));
+            StorageFile file = null;
+            try
+            {
+                file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId));
+            }catch(Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                timer.Interval = TimeSpan.FromSeconds(2);
+                timer.Start();
+            }
 
             if (c.lockscr)
             {
@@ -145,7 +156,7 @@ namespace Pixiv_Wallpaper_for_Win10
             br.Stretch = Stretch.UniformToFill;
             br.AlignmentX = AlignmentX.Left;
             br.AlignmentY = AlignmentY.Top;
-            br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.userId + c.lastImg.imgId));
+            br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
             
             gr.Background = br;
 

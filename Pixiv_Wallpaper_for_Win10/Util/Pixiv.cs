@@ -198,6 +198,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         {
             HttpUtil info2 = new HttpUtil(ILLUST_URL + imgid + "&tt=" + token, HttpUtil.Contype.JSON);
             info2.cookie = c.cookie;
+            info2.referer = "http://www.pixiv.net/recommended.php";
             string data = await info2.GetDataAsync();
             Debug.WriteLine(data);
 
@@ -284,7 +285,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             HttpUtil download = new HttpUtil(img.imgUrl, HttpUtil.Contype.IMG);
             download.referer = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + img.imgId;
             download.cookie = c.cookie;
-            string path = await download.ImageDownloadAsync(img.userId, img.imgId);
+            string path = await download.ImageDownloadAsync(img.imgId);
             return path;
         }
 

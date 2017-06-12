@@ -127,7 +127,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             {
                 Stream s = response.GetResponseStream();
 
-                if(response.Headers["Content-Encoding"]!=null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
                 {
                     s = new GZipStream(s, CompressionMode.Decompress);
                 }
@@ -150,7 +150,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <param name="userid">图片作者ID</param>
         /// <param name="imgid">图片ID</param>
         /// <returns>图片存储地址</returns>
-        public async Task<string> ImageDownloadAsync(string userid, string imgid)
+        public async Task<string> ImageDownloadAsync(string imgid)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "GET";
@@ -163,25 +163,28 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 Stream s = response.GetResponseStream();
-                StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(userid + imgid, CreationCollisionOption.ReplaceExisting);
 
-                Stream write = await file.OpenStreamForWriteAsync();
-                int l;
-                long a=0;
-                do
+                if (await ApplicationData.Current.LocalFolder.TryGetItemAsync(imgid) == null)
                 {
-                    byte[] temp = new byte[1024];
-                    l = s.Read(temp, 0, 1024);
-                    if (l > 0)
+                    StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(imgid, CreationCollisionOption.OpenIfExists);
+                    Stream write = await file.OpenStreamForWriteAsync();
+                    int l;
+                    long a = 0;
+                    do
                     {
-                       await write.WriteAsync(temp, 0, l);
-                    }
-                    a += l;
+                        byte[] temp = new byte[1024];
+                        l = s.Read(temp, 0, 1024);
+                        if (l > 0)
+                        {
+                            await write.WriteAsync(temp, 0, l);
+                        }
+                        a += l;
 
-                } while (l > 0);
+                    } while (l > 0);
 
-                write.Dispose();
-                s.Dispose();
+                    write.Dispose();
+                    s.Dispose();
+                }
             }
             else
             {
@@ -190,7 +193,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
             response.Dispose();
 
-            return userid + imgid;
+            return imgid;
 
         }
 

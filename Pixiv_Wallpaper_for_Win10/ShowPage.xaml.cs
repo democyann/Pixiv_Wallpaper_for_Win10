@@ -40,7 +40,7 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 img = c.lastImg;
 
-                show_img.Source = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.userId+c.lastImg.imgId));
+                show_img.Source = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.imgId));
 
                 textBlock1.Text = img.imgName;
                 textBlock2.Text = img.userName;
