@@ -8,9 +8,8 @@
     mc:Ignorable="d">
 
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Name="gr">
+    <Grid x:Name="gr" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
         <SplitView  OpenPaneLength="250" IsPaneOpen="false" x:Name="lis" DisplayMode="CompactOverlay" CompactPaneLength="40" Canvas.ZIndex="1">
-
             <SplitView.Pane>
                 <StackPanel Height="auto" Background="#FF006AB4">
                     <Button FontSize="18" VerticalAlignment="Top" Width="250" Height="50" FontFamily="Segoe MDL2 Assets" Click="Button_Click" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark">
