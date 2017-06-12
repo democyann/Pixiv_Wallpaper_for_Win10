@@ -63,18 +63,18 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             ImageInfo img = null;
             if(like!=null&&like.Count!=0)
             {
-                while(true)
+                Random r = new Random();
+                while (true)
                 {
-                    Random r = new Random();
                     int number=r.Next(0, 50);
-                    if(like[number]!=null&& img.WHratio>1.5)
+                    string id = like[number].ToString();
+                    img = await pixiv.getImageInfo(id);
+                    if (like[number]!=null&& img.WHratio>=1.33)
                     {
-                        string id=like[number].ToString();
-                        img =await pixiv.getImageInfo(id);
+                        await pixiv.downloadImg(img);
                     }
                     break;
                 }
-                await pixiv.downloadImg(img);
             }
             return img;
         }

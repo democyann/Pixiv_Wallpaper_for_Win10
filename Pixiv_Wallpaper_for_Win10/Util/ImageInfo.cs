@@ -67,7 +67,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 }
                 else
                 {
-                    return width * 1.0 / height;
+                    return width * 1.00 / height;
                 }
             }
         }
