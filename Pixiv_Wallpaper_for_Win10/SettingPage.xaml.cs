@@ -39,6 +39,10 @@ namespace Pixiv_Wallpaper_for_Win10
             combox1.Items.Add(new KeyValuePair<string, int>("30 分钟", 30));
             combox1.Items.Add(new KeyValuePair<string, int>("60 分钟", 60));
 
+            com_lock.Items.Add(new KeyValuePair<string, int>("仅更换壁纸", 0));
+            com_lock.Items.Add(new KeyValuePair<string, int>("仅更换锁屏", 1));
+            com_lock.Items.Add(new KeyValuePair<string, int>("同时更换壁纸和锁屏", 2));
+
             //值填充
             Conf c = new Conf();
 
@@ -56,7 +60,7 @@ namespace Pixiv_Wallpaper_for_Win10
                     radiobutton1.IsChecked = true;
                     break;
             }
-            lock_che.IsChecked = c.lockscr;
+            com_lock.SelectedValue = c.lockscr;
             textbox1.Text = c.account;
             passwordbox1.Password = c.password;
 
@@ -73,7 +77,7 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 localSettings.Values["Mode"] = "Top_50";         //设置本地保存文件（模式）为TOP50
             }
-            localSettings.Values["Lock"] = lock_che.IsChecked;
+            localSettings.Values["Lock"] = com_lock.SelectedValue;
             localSettings.Values["Account"] = textbox1.Text;     //保存账号
             localSettings.Values["Password"] = passwordbox1.Password;    //保存密码
             localSettings.Values["Time"] = combox1.SelectedValue;    //保存时间

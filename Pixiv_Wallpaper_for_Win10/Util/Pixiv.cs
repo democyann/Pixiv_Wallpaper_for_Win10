@@ -233,7 +233,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     imgurl = ill.meta_single_page;
                     imginfo.imgUrl = imgurl.original_image_url;
                 }
-
                 imginfo.isR18 = imginfo.imgUrl.Contains("limit_r18");
 
                 dynamic user = ill.user;
@@ -252,7 +251,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     string info2 = await getImageInfoSub2(id);
                     if (!info2.Equals("ERROR"))
                     {
-                        dynamic d = JObject.Parse(info2);
+                        Debug.WriteLine(info2);
+                        dynamic d = JArray.Parse(info2)[0];
                         imginfo.userId = d.illust_user_id;
                         imginfo.imgId = d.illust_id;
                         imginfo.imgUrl = d.url;

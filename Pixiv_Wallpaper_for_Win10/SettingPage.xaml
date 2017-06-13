@@ -26,7 +26,9 @@
                 <TextBlock Text="密码:" Margin="30,10,0,0" FontSize="15" RequestedTheme="Dark"/>
                 <PasswordBox x:Name="passwordbox1" Margin="10,10,0,0" Width="200"  RequestedTheme="Dark"/>
             </StackPanel>
-            <CheckBox Content="同时更换锁屏" x:Name="lock_che" Margin="30,10,0,0" RequestedTheme="Dark"></CheckBox>
+            <TextBlock Text="更换模式" Margin="30,0,0,0" FontSize="20" RequestedTheme="Dark"/>
+            <ComboBox Margin="30,10,0,0" Width="200" x:Name="com_lock" DisplayMemberPath="Key" SelectedValuePath="Value" RequestedTheme="Dark">
+            </ComboBox>
             <Button x:Name="button1" Content="确定"  Click="button1_Click" Margin="30,10,0,0" RequestedTheme="Dark"/>
         </StackPanel>
     </Grid>

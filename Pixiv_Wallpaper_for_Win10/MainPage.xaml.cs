@@ -54,7 +54,8 @@ namespace Pixiv_Wallpaper_for_Win10
             li_uptimer.Tick += Li_uptimer_Tick;
             li_uptimer.Start();
 
-            if (c.lastImg != null) { 
+            if (c.lastImg != null)
+            {
                 ImageBrush br = new ImageBrush();
                 br.Stretch = Stretch.UniformToFill;
                 br.AlignmentX = AlignmentX.Left;
@@ -138,14 +139,15 @@ namespace Pixiv_Wallpaper_for_Win10
             try
             {
                 file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId));
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
                 timer.Interval = TimeSpan.FromSeconds(2);
                 timer.Start();
             }
 
-            if (c.lockscr)
+            if (c.lockscr >= 1)
             {
                 //更换锁屏
                 bool lockscr = await settings.TrySetLockScreenImageAsync(file);
@@ -155,20 +157,23 @@ namespace Pixiv_Wallpaper_for_Win10
                     await dialog.ShowAsync();
                 }
             }
-            //更换壁纸
-            bool deskscr = await settings.TrySetWallpaperImageAsync(file);
-
-            if (!deskscr)
+            if (c.lockscr != 1)
             {
-                dialog.Content = "更换壁纸操作失败。";
-                await dialog.ShowAsync();
+                //更换壁纸
+                bool deskscr = await settings.TrySetWallpaperImageAsync(file);
+
+                if (!deskscr)
+                {
+                    dialog.Content = "更换壁纸操作失败。";
+                    await dialog.ShowAsync();
+                }
             }
             ImageBrush br = new ImageBrush();
             br.Stretch = Stretch.UniformToFill;
             br.AlignmentX = AlignmentX.Left;
             br.AlignmentY = AlignmentY.Top;
             br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
-            
+
             gr.Background = br;
 
             timer.Interval = TimeSpan.FromMinutes(c.time);
