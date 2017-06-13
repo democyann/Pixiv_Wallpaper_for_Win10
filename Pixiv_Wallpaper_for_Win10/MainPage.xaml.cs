@@ -54,12 +54,23 @@ namespace Pixiv_Wallpaper_for_Win10
             li_uptimer.Tick += Li_uptimer_Tick;
             li_uptimer.Start();
 
-            ImageBrush br = new ImageBrush();
-            br.Stretch = Stretch.UniformToFill;
-            br.AlignmentX = AlignmentX.Left;
-            br.AlignmentY = AlignmentY.Top;
-            br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.userId + c.lastImg.imgId));
-            gr.Background = br;
+            if (c.lastImg != null) { 
+                ImageBrush br = new ImageBrush();
+                br.Stretch = Stretch.UniformToFill;
+                br.AlignmentX = AlignmentX.Left;
+                br.AlignmentY = AlignmentY.Top;
+                br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.imgId));
+                gr.Background = br;
+            }
+            else
+            {
+                ImageBrush br = new ImageBrush();
+                br.Stretch = Stretch.UniformToFill;
+                br.AlignmentX = AlignmentX.Left;
+                br.AlignmentY = AlignmentY.Top;
+                br.ImageSource = new BitmapImage(new Uri("ms-appx:///Res/62258773_p0.png"));
+                gr.Background = br;
+            }
 
             main.Navigate(typeof(ShowPage));
         }
