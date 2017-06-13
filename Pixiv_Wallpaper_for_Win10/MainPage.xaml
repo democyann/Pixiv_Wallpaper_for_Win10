@@ -12,7 +12,7 @@
         <SplitView  OpenPaneLength="250" IsPaneOpen="false" x:Name="lis" DisplayMode="CompactOverlay" CompactPaneLength="40" Canvas.ZIndex="1">
             <SplitView.Pane>
                 <StackPanel Height="auto" Background="#FF006AB4">
-                    <Button FontSize="18" VerticalAlignment="Top" Width="250" Height="50" FontFamily="Segoe MDL2 Assets" Click="Button_Click" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark">
+                    <Button FontSize="18" VerticalAlignment="Top" Width="40" Height="50" FontFamily="Segoe MDL2 Assets" Click="Button_Click" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark">
                         <TextBlock Text="&#xE700;"></TextBlock>
                     </Button>
                     <Button x:Name="show_btn" FontSize="18" Height="50" Width="250" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark" Click="show_btn_Click">
