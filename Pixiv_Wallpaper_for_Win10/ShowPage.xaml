@@ -7,7 +7,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid>
+        <Grid.Background>
+            <AcrylicBrush x:Name="CMapUwpAcrylicBrush"
+              BackgroundSource="HostBackdrop"
+              TintColor="#FFE4E4E4"
+              TintOpacity="0.05"
+              FallbackColor="{StaticResource SystemChromeWhiteColor}"/>
+        </Grid.Background>
         <Image x:Name="show_img"></Image>
         <StackPanel Canvas.ZIndex="1" VerticalAlignment="Bottom">
             <StackPanel.Background>

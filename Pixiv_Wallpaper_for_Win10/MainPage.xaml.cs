@@ -97,6 +97,7 @@ namespace Pixiv_Wallpaper_for_Win10
         private void Timer_Tick(object sender, object e)
         {
             update();
+            SetWallpaper();
         }
         /// <summary>
         /// 作品更新并显示
@@ -104,7 +105,6 @@ namespace Pixiv_Wallpaper_for_Win10
         private async void update()
         {
             timer.Stop();
-            var dialog = new MessageDialog("");
 
             //ImageInfo img;
             switch (c.mode)
@@ -113,7 +113,8 @@ namespace Pixiv_Wallpaper_for_Win10
                     img = await top50.SelectArtWork();
                     break;
                 case "You_Like":
-                    img = await like.SelectArtWork();
+                    img = await top50.SelectArtWork();
+                    // img = await like.SelectArtWork();
                     break;
                 default:
                     img = await top50.SelectArtWork();
@@ -123,10 +124,13 @@ namespace Pixiv_Wallpaper_for_Win10
             if (img != null)
             {
                 c.lastImg = img;
-                main.Navigate(typeof(ShowPage));
+                main.Navigate(typeof(ShowPage));//图片展示页面更新
             }
+        }
 
-
+        private async void SetWallpaper()
+        {
+            var dialog = new MessageDialog("");
             if (!UserProfilePersonalizationSettings.IsSupported())
             {
                 dialog.Content = "您的设备不支持自动更换壁纸";
@@ -138,7 +142,8 @@ namespace Pixiv_Wallpaper_for_Win10
             try
             {
                 file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId));
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
                 timer.Interval = TimeSpan.FromSeconds(2);
@@ -168,12 +173,15 @@ namespace Pixiv_Wallpaper_for_Win10
             br.AlignmentX = AlignmentX.Left;
             br.AlignmentY = AlignmentY.Top;
             br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
-            
+
             gr.Background = br;
 
             timer.Interval = TimeSpan.FromMinutes(c.time);
             timer.Start();
         }
+
+            
+
 
 
         private void Button_Click(object sender, RoutedEventArgs e)     //汉堡界面开关
@@ -200,6 +208,11 @@ namespace Pixiv_Wallpaper_for_Win10
         {
             var uriPixiv = new Uri(@"https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + img.imgId);
             var visit = await Windows.System.Launcher.LaunchUriAsync(uriPixiv);
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            SetWallpaper();
         }
     }
 }

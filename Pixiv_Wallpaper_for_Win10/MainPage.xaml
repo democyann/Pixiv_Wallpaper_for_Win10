@@ -5,41 +5,49 @@
     xmlns:local="using:Pixiv_Wallpaper_for_Win10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Windows10FallCreatorsUpdate="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 5)"
     mc:Ignorable="d">
 
 
-    <Grid x:Name="gr" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
-        <SplitView  OpenPaneLength="250" IsPaneOpen="false" x:Name="lis" DisplayMode="CompactOverlay" CompactPaneLength="40" Canvas.ZIndex="1">
+    <Grid x:Name="gr">
+        <Grid.Background>
+            <AcrylicBrush x:Name="CMapUwpAcrylicBrush"
+              BackgroundSource="Backdrop"
+              TintColor="#FFE4E4E4"
+              TintOpacity="0.05"
+              FallbackColor="{StaticResource SystemChromeWhiteColor}"/>
+        </Grid.Background>
+        <SplitView  OpenPaneLength="250" IsPaneOpen="false" x:Name="lis" DisplayMode="CompactOverlay" CompactPaneLength="40" Canvas.ZIndex="1" PaneBackground="#66000000" Margin="0,20,0,0">
             <SplitView.Pane>
-                <StackPanel Height="auto" Background="#FF006AB4">
-                    <Button FontSize="18" VerticalAlignment="Top" Width="40" Height="50" FontFamily="Segoe MDL2 Assets" Click="Button_Click" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark">
-                        <TextBlock Text="&#xE700;"></TextBlock>
+                <StackPanel Height="auto" Background="#00000000">
+                    <Button FontSize="18" VerticalAlignment="Top" Width="40" Height="50" FontFamily="Segoe MDL2 Assets" Click="Button_Click" HorizontalContentAlignment="Left" Background="#00000000" Foreground="White" RequestedTheme="Dark" FocusVisualPrimaryBrush="#00000000">
+                        <TextBlock Text="&#xE700;" HorizontalAlignment="Center" Height="18" VerticalAlignment="Center"/>
                     </Button>
-                    <Button x:Name="show_btn" FontSize="18" Height="50" Width="250" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark" Click="show_btn_Click">
+                    <Button x:Name="show_btn" FontSize="18" Height="50" Width="250" HorizontalContentAlignment="Left" Background="#00000000" Foreground="White" RequestedTheme="Dark" Click="show_btn_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE80F;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <TextBlock Text="预览" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    <Button FontSize="18" Height="50" Width="250" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark" x:Name="next_btn" Click="next_btn_Click">
+                    <Button FontSize="18" Height="50" Width="250" HorizontalContentAlignment="Left" Background="#00000000" Foreground="White" RequestedTheme="Dark" x:Name="next_btn" Click="next_btn_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE0AB;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <TextBlock Text="下一张" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                         </StackPanel>
                     </Button>
-                    <Button FontSize="18" Height="50" Width="250" HorizontalContentAlignment="Left" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark">
+                    <Button FontSize="18" Height="50" Width="250" HorizontalContentAlignment="Left" Background="#00000000" Foreground="White" RequestedTheme="Dark" Click="Button_Click_1">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE71D;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                            <TextBlock Text="历史记录" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE73E;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock Text="确认更改" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                         </StackPanel>
                     </Button>
-                    <Button x:Name="setting_btn" FontSize="18" VerticalAlignment="Bottom" Height="50" Width="250" HorizontalContentAlignment="Left" Margin="0" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark" Click="setting_btn_Click">
+                    <Button x:Name="setting_btn" FontSize="18" VerticalAlignment="Bottom" Height="50" Width="250" HorizontalContentAlignment="Left" Margin="0" Background="#00000000" Foreground="White" RequestedTheme="Dark" Click="setting_btn_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE713;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <TextBlock Text="设置" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                         </StackPanel>
                     </Button>
-                    <Button x:Name="visiturl_button" FontSize="18" VerticalAlignment="Bottom" Height="50" Width="250" HorizontalContentAlignment="Left" Margin="0" Background="#FF006AB4" Foreground="White" RequestedTheme="Dark" Click="visiturl_btn_Click">
+                    <Button x:Name="visiturl_button" FontSize="18" VerticalAlignment="Bottom" Height="50" Width="250" HorizontalContentAlignment="Left" Margin="0" Background="#00000000" Foreground="White" RequestedTheme="Dark" Click="visiturl_btn_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock  FontFamily="Segoe MDL2 Assets" Text="&#xE167;" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <TextBlock Text="访问网页" Margin="20,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
