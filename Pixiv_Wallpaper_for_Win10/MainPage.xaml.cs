@@ -60,7 +60,7 @@ namespace Pixiv_Wallpaper_for_Win10
                 br.AlignmentX = AlignmentX.Left;
                 br.AlignmentY = AlignmentY.Top;
                 br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.imgId));
-                gr.Background = br;
+                //gr.Background = br;
             }
             else
             {
@@ -69,7 +69,7 @@ namespace Pixiv_Wallpaper_for_Win10
                 br.AlignmentX = AlignmentX.Left;
                 br.AlignmentY = AlignmentY.Top;
                 br.ImageSource = new BitmapImage(new Uri("ms-appx:///Res/62258773_p0.png"));
-                gr.Background = br;
+                //gr.Background = br;
             }
 
             main.Navigate(typeof(ShowPage));
@@ -84,7 +84,8 @@ namespace Pixiv_Wallpaper_for_Win10
                     await top50.listUpdate(true);
                     break;
                 case "You_Like":
-                    await like.ListUpdate(true);
+                    await top50.listUpdate(true);
+                    //await like.ListUpdate(true);
                     break;
                 default:
                     await top50.listUpdate(true);
@@ -114,7 +115,7 @@ namespace Pixiv_Wallpaper_for_Win10
                     break;
                 case "You_Like":
                     img = await top50.SelectArtWork();
-                    // img = await like.SelectArtWork();
+                    //img = await like.SelectArtWork();
                     break;
                 default:
                     img = await top50.SelectArtWork();
@@ -174,7 +175,7 @@ namespace Pixiv_Wallpaper_for_Win10
             br.AlignmentY = AlignmentY.Top;
             br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
 
-            gr.Background = br;
+            //gr.Background = br;
 
             timer.Interval = TimeSpan.FromMinutes(c.time);
             timer.Start();

@@ -11,20 +11,20 @@
         <Grid.Background>
             <AcrylicBrush x:Name="CMapUwpAcrylicBrush"
               BackgroundSource="HostBackdrop"
-              TintColor="#FFE4E4E4"
-              TintOpacity="0.05"
-              FallbackColor="{StaticResource SystemChromeWhiteColor}"/>
+              TintColor="#FFFFFBFB"
+              TintOpacity="0.1"
+              FallbackColor="{StaticResource SystemAccentColor}"/>
         </Grid.Background>
         <Image x:Name="show_img"></Image>
-        <StackPanel Canvas.ZIndex="1" VerticalAlignment="Bottom">
+        <StackPanel Canvas.ZIndex="1" VerticalAlignment="Bottom" >
             <StackPanel.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Offset="0"/>
                     <GradientStop Color="Black" Offset="1"/>
                 </LinearGradientBrush>
             </StackPanel.Background>
-            <TextBlock x:Name="textBlock1" FontSize="36" Foreground="White" />
-            <TextBlock x:Name="textBlock2" FontSize="28" Foreground="White" />
+            <TextBlock x:Name="textBlock1" FontSize="36" Foreground="White" Margin="40,0,0,0"/>
+            <TextBlock x:Name="textBlock2" FontSize="28" Foreground="White" Margin="40,0,0,0"/>
             <TextBlock Grid.Row="1" x:Name="textBlock3" HorizontalAlignment="Right" 
                    Foreground="White" VerticalAlignment="Center" FontSize="32" Margin="0,0,30,0"/>
         </StackPanel>

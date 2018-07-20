@@ -9,7 +9,7 @@
     mc:Ignorable="d">
 
     <Grid Background="#B20F0F0F">
-        <StackPanel x:Name="sp1" >
+        <StackPanel x:Name="sp1" Margin="40,0,0,0">
             <TextBlock Text="更新时间" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
             <TextBlock Text="设置更新图片的时间间隔" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
             <ComboBox Margin="30,10,0,0" Width="200" x:Name="combox1" DisplayMemberPath="Key" SelectedValuePath="Value" RequestedTheme="Dark">
