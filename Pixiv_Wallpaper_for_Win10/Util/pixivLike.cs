@@ -69,7 +69,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     int number=r.Next(0, like.Count);
                     string id = like[number].ToString();
                     img = await pixiv.getImageInfo(id);
-                    if (like[number]!=null&& img.WHratio>=1.33)
+                    if (like[number]!=null&& img.WHratio>=1.33&&!img.isR18)
                     {
                         await pixiv.downloadImg(img);
                         break;

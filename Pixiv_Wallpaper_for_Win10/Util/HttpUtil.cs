@@ -74,6 +74,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Headers["Cookie"] = cookie;
             request.Headers["Accept-Encoding"] = "gzip,deflate,sdch";
             request.Headers["User-Agent"] = USER_AGENT;
+            request.Headers["Scheme"] = "https";
+            request.Headers["Authority"] = "www.pixiv.net";
             if (referer != null)
             {
                 request.Headers["Referer"] = referer;

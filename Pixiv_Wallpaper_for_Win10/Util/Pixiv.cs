@@ -16,7 +16,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         private readonly String INDEX_URL = "https://www.pixiv.net";
         private readonly String POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh&source=pc&view_type=page&ref=wwwtop_accounts_index";
         private readonly String LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=zh";
-        private readonly String RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=500&tt=";
+        private readonly String RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=1000&page=discovery&mode=all&tt=";
         private readonly String ILLUST_URL = "https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
         private readonly String DETA_URL = "https://api.imjad.cn/pixiv/v1/?type=illust&id=";
         private readonly String RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
@@ -156,7 +156,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             ArrayList list = new ArrayList();
             HttpUtil recomm = new HttpUtil(RECOMM_URL+token, HttpUtil.Contype.JSON);
             recomm.cookie = cookie;
-            recomm.referer = "http://www.pixiv.net/recommended.php";
+            recomm.referer = "https://www.pixiv.net/discovery";
 
             like = await recomm.GetDataAsync();
 
@@ -207,10 +207,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 dynamic o = JObject.Parse(info1);
                 dynamic ill = o.response;
                 imginfo.viewCount = (int)ill[0]["stats"]["views_count"];
-
-                /*丢弃该图
-                PixivTop50 t50 = new PixivTop50();
-                await t50.SelectArtWork();*/
                 imginfo.imgUrl = ill[0]["image_urls"]["large"].ToString();
                 Debug.Write(imginfo.imgUrl);
                 switch(ill[0]["age_limit"].ToString())
@@ -222,9 +218,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                         imginfo.isR18 = true;
                         break;
                 }
-                
-                /*未完成*/
-                
 
                 dynamic user = ill[0]["user"].ToString();
                 imginfo.userId = ill[0]["user"]["id"].ToString();

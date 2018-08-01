@@ -60,7 +60,6 @@ namespace Pixiv_Wallpaper_for_Win10
                 br.AlignmentX = AlignmentX.Left;
                 br.AlignmentY = AlignmentY.Top;
                 br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.imgId));
-                //gr.Background = br;
             }
             else
             {
@@ -69,7 +68,6 @@ namespace Pixiv_Wallpaper_for_Win10
                 br.AlignmentX = AlignmentX.Left;
                 br.AlignmentY = AlignmentY.Top;
                 br.ImageSource = new BitmapImage(new Uri("ms-appx:///Res/62258773_p0.png"));
-                //gr.Background = br;
             }
 
             main.Navigate(typeof(ShowPage));
@@ -84,8 +82,7 @@ namespace Pixiv_Wallpaper_for_Win10
                     await top50.listUpdate(true);
                     break;
                 case "You_Like":
-                    await top50.listUpdate(true);
-                    //await like.ListUpdate(true);
+                    await like.ListUpdate(true);
                     break;
                 default:
                     await top50.listUpdate(true);
@@ -114,8 +111,7 @@ namespace Pixiv_Wallpaper_for_Win10
                     img = await top50.SelectArtWork();
                     break;
                 case "You_Like":
-                    img = await top50.SelectArtWork();
-                    //img = await like.SelectArtWork();
+                    img = await like.SelectArtWork();
                     break;
                 default:
                     img = await top50.SelectArtWork();
@@ -182,7 +178,6 @@ namespace Pixiv_Wallpaper_for_Win10
         }
 
             
-
 
 
         private void Button_Click(object sender, RoutedEventArgs e)     //汉堡界面开关
