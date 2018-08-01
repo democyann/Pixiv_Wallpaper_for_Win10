@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Windows.UI.Popups;
 
 namespace Pixiv_Wallpaper_for_Win10.Util
 {
@@ -16,7 +17,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         private readonly String INDEX_URL = "https://www.pixiv.net";
         private readonly String POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh&source=pc&view_type=page&ref=wwwtop_accounts_index";
         private readonly String LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=zh";
-        private readonly String RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=1000&page=discovery&mode=all&tt=";
+        private readonly String RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=500&page=discovery&mode=all&tt=";
         private readonly String ILLUST_URL = "https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
         private readonly String DETA_URL = "https://api.imjad.cn/pixiv/v1/?type=illust&id=";
         private readonly String RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
@@ -42,8 +43,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
             rall = await top50.GetDataAsync();
 
-            Debug.WriteLine(rall);
-
             if (!rall.Equals("ERROR"))
             {
                 dynamic o = JObject.Parse(rall);
@@ -52,12 +51,12 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 foreach (JToken j in arr)
                 {
                     list.Add(j["illust_id"].ToString());
-                    Debug.WriteLine(j["illust_id"].ToString());
                 }
             }
             else
             {
-                Debug.WriteLine("ERROR");
+                MessageDialog dialog = new MessageDialog("update rall list Error");
+                await dialog.ShowAsync();
             }
             return list;
         }
@@ -82,7 +81,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     cookie = posturl.cookie;
                 }
             }
-            Debug.WriteLine("POST KEY:" + key);
             return key;
         }
 
@@ -138,7 +136,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 if (r.IsMatch(data))
                 {
                     token = r.Match(data).Groups[1].ToString();
-                    Debug.WriteLine("TOKEN:" + token);
                     f = true;
                 }
             }
@@ -160,8 +157,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
             like = await recomm.GetDataAsync();
 
-            Debug.WriteLine(like);
-
             if (like != "ERROR")
             {
                 dynamic o = JObject.Parse(like);
@@ -169,11 +164,13 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 foreach(JToken j in arr)
                 {
                     list.Add(j.ToString());
-                    Debug.WriteLine(j.ToString());
                 }
             }
             else
-                Debug.WriteLine("ERROR");
+            {
+                MessageDialog dialog = new MessageDialog("update recomm list Error");
+                await dialog.ShowAsync();
+            }
             return list;
         }
         /// <summary>
@@ -185,8 +182,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         {
             HttpUtil info1 = new HttpUtil(DETA_URL + imgid, HttpUtil.Contype.JSON);
             string data = await info1.GetDataAsync();
-            Debug.WriteLine(data);
-
             return data;
         }
        
@@ -208,7 +203,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 dynamic ill = o.response;
                 imginfo.viewCount = (int)ill[0]["stats"]["views_count"];
                 imginfo.imgUrl = ill[0]["image_urls"]["large"].ToString();
-                Debug.Write(imginfo.imgUrl);
                 switch(ill[0]["age_limit"].ToString())
                 {
                     case "all_age":

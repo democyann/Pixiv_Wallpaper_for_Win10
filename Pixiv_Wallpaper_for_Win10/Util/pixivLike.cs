@@ -57,8 +57,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             
 
-            
-
             await ListUpdate();
             ImageInfo img = null;
             if(like!=null&&like.Count!=0)
