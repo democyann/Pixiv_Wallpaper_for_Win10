@@ -127,6 +127,8 @@
     <None Include="Pixiv_Wallpaper_for_Win10_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="preview_img\DVP~0LYRFZ`MA1W4%24LD[J]N.png" />
+    <Content Include="preview_img\WL0%40M5QE8R_%24V[_COMK%40G94.png" />
     <Content Include="Properties\Default.rd.xml">
       <SubType>Designer</SubType>
     </Content>
