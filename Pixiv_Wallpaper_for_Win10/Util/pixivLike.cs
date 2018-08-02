@@ -39,17 +39,17 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             {
                 if (c.token.Equals(""))
                 {
-                    if (!await pixiv.getToken(true))
+                    if (!await pixiv.getToken(true))            //getToken不成功，返回null
                     {
                         return null;
                     }
-                    else
+                    else                                       //getToken成功，将token写入配置文件
                     {
                         c.cookie = pixiv.cookie;
                         c.token = pixiv.token;
                     }
                 }
-                else
+                else                                          //配置文件中已有token，直接调用
                 {
                     pixiv.cookie = c.cookie;
                     pixiv.token = c.token;

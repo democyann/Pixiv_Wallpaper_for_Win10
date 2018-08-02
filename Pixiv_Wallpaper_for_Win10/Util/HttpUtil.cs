@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using System.Diagnostics;
 using System.IO.Compression;
+using Windows.UI.Popups;
 
 namespace Pixiv_Wallpaper_for_Win10.Util
 {
@@ -80,24 +81,34 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             {
                 request.Headers["Referer"] = referer;
             }
-            HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-            string res = "Error";
-            if (response.StatusCode == HttpStatusCode.OK)
+            try
             {
-                Stream s = response.GetResponseStream();
-                if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                string res = "Error";
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    s = new GZipStream(s, CompressionMode.Decompress);
-                }
-                StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
-                res = await sr.ReadToEndAsync();
-                cookie = response.Headers["Set-Cookie"];
+                    Stream s = response.GetResponseStream();
+                    if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                    {
+                        s = new GZipStream(s, CompressionMode.Decompress);
+                    }
+                    StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
+                    res = await sr.ReadToEndAsync();
+                    cookie = response.Headers["Set-Cookie"];
 
-                sr.Dispose();
-                s.Dispose();
+                    sr.Dispose();
+                    s.Dispose();  
+                }
+                response.Dispose();
+                return res;
             }
-            response.Dispose();
-            return res;
+            catch(Exception e)
+            {
+                MessageDialog showerror = new MessageDialog("");
+                showerror.Content = e.Message.ToString() + "请正确设置网络代理";
+                await showerror.ShowAsync();
+                return "ERROR";
+            }
         }
         /// <summary>
         /// HTTP POST 请求
@@ -123,28 +134,36 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             write.Write(databit, 0, databit.Length);
             write.Dispose();
 
-            HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-            string res = "ERROR";
-            if (response.StatusCode == HttpStatusCode.OK)
+            try
             {
-                Stream s = response.GetResponseStream();
-
-                if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                string res = "ERROR";
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    s = new GZipStream(s, CompressionMode.Decompress);
+                    Stream s = response.GetResponseStream();
+
+                    if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                    {
+                        s = new GZipStream(s, CompressionMode.Decompress);
+                    }
+                    StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
+                    res = await sr.ReadToEndAsync();
+                    cookie = response.Headers["Set-Cookie"];
+                    sr.Dispose();
+                    s.Dispose();
                 }
+                response.Dispose();
 
-                StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
-                res = await sr.ReadToEndAsync();
-                cookie = response.Headers["Set-Cookie"];
-
-                sr.Dispose();
-                s.Dispose();
-
+                return res;
             }
-            response.Dispose();
-
-            return res;
+            catch(Exception e)
+            {
+                MessageDialog showerror = new MessageDialog("");
+                showerror.Content = e.Message.ToString()+"请正确设置网络代理";
+                await showerror.ShowAsync();
+                return "ERROR";
+            }
+            
         }
         /// <summary>
         /// 图片下载方法

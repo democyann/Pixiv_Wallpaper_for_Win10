@@ -72,7 +72,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
             HttpUtil posturl = new HttpUtil(POST_KEY_URL, HttpUtil.Contype.HTML);
             string poststr = await posturl.GetDataAsync();
-            if (!posturl.Equals("ERROR"))
+            if (!poststr.Equals("ERROR"))
             {
                 Regex r = new Regex("name=\"post_key\"\\svalue=\"([a-z0-9]{32})\"", RegexOptions.Singleline);
                 if (r.IsMatch(poststr))
@@ -109,8 +109,12 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     cookie = loginurl.cookie;
                     f = true;
                 }
+                else
+                {
+                    MessageDialog show_fail = new MessageDialog("登录失败,请输入正确的账号密码");
+                    await show_fail.ShowAsync();
+                }
             }
-
             return f;
         }
 
@@ -124,7 +128,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             bool f = false;
             if (flag)
             {
-                if (!await login()) return f;
+                if (!await login()) return f;                //如果没登录成功，返回结果false
             }
 
             HttpUtil tokurl = new HttpUtil(INDEX_URL, HttpUtil.Contype.HTML);
