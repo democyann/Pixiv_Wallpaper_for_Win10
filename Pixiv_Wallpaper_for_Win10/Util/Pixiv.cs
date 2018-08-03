@@ -9,6 +9,7 @@ using Windows.Storage;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Windows.UI.Popups;
+using Windows.UI.Xaml;
 
 namespace Pixiv_Wallpaper_for_Win10.Util
 {
@@ -22,6 +23,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         private readonly String DETA_URL = "https://api.imjad.cn/pixiv/v1/?type=illust&id=";
         private readonly String RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
         private Conf c;
+
+        
 
         public string cookie { get; set; }
         public string token { get; set; }
@@ -111,8 +114,13 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 }
                 else
                 {
-                    MessageDialog show_fail = new MessageDialog("登录失败,请输入正确的账号密码");
-                    await show_fail.ShowAsync();
+                    //使UI线程调用lambda表达式内的方法
+                    await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async() => 
+                    {
+                        //UI code here
+                        MessageDialog dialog = new MessageDialog("登录失败,请输入正确的账号密码");
+                        await dialog.ShowAsync();
+                    });
                 }
             }
             return f;
@@ -155,7 +163,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         {
             string like;
             ArrayList list = new ArrayList();
-            HttpUtil recomm = new HttpUtil(RECOMM_URL+token, HttpUtil.Contype.JSON);
+            HttpUtil recomm = new HttpUtil(RECOMM_URL + token, HttpUtil.Contype.JSON);
             recomm.cookie = cookie;
             recomm.referer = "https://www.pixiv.net/discovery";
 
@@ -165,16 +173,23 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             {
                 dynamic o = JObject.Parse(like);
                 JArray arr = o.recommendations;
-                foreach(JToken j in arr)
+                foreach (JToken j in arr)
                 {
                     list.Add(j.ToString());
                 }
             }
             else
             {
-                MessageDialog dialog = new MessageDialog("update recomm list Error");
-                await dialog.ShowAsync();
+                //使UI线程调用lambda表达式内的方法
+                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("update recomm list Error");
+                    await dialog.ShowAsync();
+                });
+
             }
+    
             return list;
         }
         /// <summary>

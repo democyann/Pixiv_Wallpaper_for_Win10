@@ -20,6 +20,7 @@ using System.Threading;
 using Windows.System.UserProfile;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Media.Imaging;
+using System.Threading.Tasks;
 
 namespace Pixiv_Wallpaper_for_Win10
 {
@@ -36,10 +37,12 @@ namespace Pixiv_Wallpaper_for_Win10
         private PixivTop50 top50;
         private PixivLike like;
         private ImageInfo img;
+        public static MainPage mp;
 
         public MainPage()
         {
             this.InitializeComponent();
+            mp = this;
             c = new Conf();
             top50 = new PixivTop50();
             like = new PixivLike();
@@ -108,13 +111,13 @@ namespace Pixiv_Wallpaper_for_Win10
             switch (c.mode)
             {
                 case "Top_50":
-                    img = await top50.SelectArtWork();
+                    await Task.Run(async () => { img = await top50.SelectArtWork(); });         
                     break;
                 case "You_Like":
-                    img = await like.SelectArtWork();
+                    await Task.Run(async () => { img = await like.SelectArtWork(); });
                     break;
                 default:
-                    img = await top50.SelectArtWork();
+                    await Task.Run(async () => { img = await like.SelectArtWork(); });
                     break;
             }
 

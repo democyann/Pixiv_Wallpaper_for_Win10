@@ -9,6 +9,7 @@ using Windows.Storage;
 using System.Diagnostics;
 using System.IO.Compression;
 using Windows.UI.Popups;
+using Windows.UI.Xaml;
 
 namespace Pixiv_Wallpaper_for_Win10.Util
 {
@@ -40,6 +41,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
         private string url;
         private Contype dataType;
+
 
         /// <summary>
         /// 设置或获取Cookie
@@ -104,9 +106,15 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             catch(Exception e)
             {
-                MessageDialog showerror = new MessageDialog("");
-                showerror.Content = e.Message.ToString() + "请正确设置网络代理";
-                await showerror.ShowAsync();
+                //使UI线程调用lambda表达式内的方法
+                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("");
+                    dialog.Content=e.Message.ToString() + "请正确设置网络代理";
+                    await dialog.ShowAsync();
+                });
+
                 return "ERROR";
             }
         }
@@ -158,9 +166,14 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             catch(Exception e)
             {
-                MessageDialog showerror = new MessageDialog("");
-                showerror.Content = e.Message.ToString()+"请正确设置网络代理";
-                await showerror.ShowAsync();
+                //使UI线程调用lambda表达式内的方法
+                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("");
+                    dialog.Content = e.Message.ToString() + "请正确设置网络代理";
+                    await dialog.ShowAsync();
+                });
                 return "ERROR";
             }
             
