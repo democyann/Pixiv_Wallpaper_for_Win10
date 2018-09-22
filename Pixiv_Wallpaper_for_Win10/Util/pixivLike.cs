@@ -70,13 +70,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     if (like[number]!=null&& img.WHratio>=1.33&&!img.isR18)
                     {
                         await pixiv.downloadImg(img);
+                        like.RemoveAt(number);
                         break;
                     }
-                    else
-                    {
-                        like.RemoveAt(number);
-                    }
-                   
+                    like.RemoveAt(number);
                 }
             }
             return img;

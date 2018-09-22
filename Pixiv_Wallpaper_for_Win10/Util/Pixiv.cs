@@ -18,7 +18,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         private readonly String INDEX_URL = "https://www.pixiv.net";
         private readonly String POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh&source=pc&view_type=page&ref=wwwtop_accounts_index";
         private readonly String LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=zh";
-        private readonly String RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=500&page=discovery&mode=all&tt=";
+        private readonly String RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=2000&page=discovery&mode=all&tt=";
         private readonly String ILLUST_URL = "https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
         private readonly String DETA_URL = "https://api.imjad.cn/pixiv/v1/?type=illust&id=";
         private readonly String RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";

@@ -17,7 +17,7 @@
             <TextBlock Text="推荐模式" Margin="30,0,0,0" FontSize="20" RequestedTheme="Dark"/>
             <RadioButton x:Name="radiobutton1" GroupName="mode" Margin="30,0,0,0" Content="每日Top50" IsChecked="True" RequestedTheme="Dark"/>
             <RadioButton x:Name="radiobutton2" GroupName="mode" Margin="30,0,0,0" Content="猜你喜欢" RequestedTheme="Dark" />
-            <TextBlock Text="Pixiv登录信息" Margin="30,10,0,0" FontSize="15" RequestedTheme="Dark"/>
+            <TextBlock Text="Pixiv登录信息" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
             <StackPanel x:Name="sp2" Orientation="Horizontal">
                 <TextBlock Text="账号:" Margin="30,10,0,0" FontSize="15" RequestedTheme="Dark"/>
                 <TextBox x:Name="textbox1" Margin="10,10,0,0"  Width="200" RequestedTheme="Dark"/>
@@ -25,6 +25,11 @@
             <StackPanel x:Name="sp3" Orientation="Horizontal">
                 <TextBlock Text="密码:" Margin="30,10,0,0" FontSize="15" RequestedTheme="Dark"/>
                 <PasswordBox x:Name="passwordbox1" Margin="10,10,0,0" Width="200"  RequestedTheme="Dark"/>
+            </StackPanel>
+            <TextBlock Text="图片缓存" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Name="clear" Content="清空缓存" Margin="30,10,0,0" RequestedTheme="Dark" Click="clear_Click"/>
+                <Button Name="openfilepath" Content="访问文件夹" Margin="30,10,0,0" Click="openfilepath_Click" RequestedTheme="Dark"/>
             </StackPanel>
             <CheckBox Content="同时更换锁屏" x:Name="lock_che" Margin="30,10,0,0" RequestedTheme="Dark"></CheckBox>
             <Button x:Name="button1" Content="确定"  Click="button1_Click" Margin="30,10,0,0" RequestedTheme="Dark"/>

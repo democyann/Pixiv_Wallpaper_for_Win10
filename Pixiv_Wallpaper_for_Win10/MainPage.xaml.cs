@@ -52,10 +52,7 @@ namespace Pixiv_Wallpaper_for_Win10
             timer.Tick += Timer_Tick;
             timer.Start();
 
-            li_uptimer = new DispatcherTimer();
-            li_uptimer.Interval = TimeSpan.FromHours(1);
-            li_uptimer.Tick += Li_uptimer_Tick;
-            li_uptimer.Start();
+
 
             if (c.lastImg != null) { 
                 ImageBrush br = new ImageBrush();
@@ -76,34 +73,15 @@ namespace Pixiv_Wallpaper_for_Win10
             main.Navigate(typeof(ShowPage));
         }
 
-        private async void Li_uptimer_Tick(object sender, object e)
-        {
-            //定时更新列表(1h/次)
-            switch (c.mode)
-            {
-                case "Top_50":
-                    await top50.listUpdate(true);
-                    break;
-                case "You_Like":
-                    await like.ListUpdate(true);
-                    break;
-                default:
-                    await top50.listUpdate(true);
-                    break;
-            }
-            li_uptimer.Interval = TimeSpan.FromHours(1);
-            li_uptimer.Start();
-        }
 
-        private void Timer_Tick(object sender, object e)
+        private async void Timer_Tick(object sender, object e)
         {
-            update();
-            SetWallpaper();
+            SetWallpaper(await update());
         }
         /// <summary>
         /// 作品更新并显示
         /// </summary>
-        private async void update()
+        private async Task<bool> update()
         {
             timer.Stop();
 
@@ -125,12 +103,18 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 c.lastImg = img;
                 main.Navigate(typeof(ShowPage));//图片展示页面更新
+
+                timer.Interval = TimeSpan.FromMinutes(c.time);
+                timer.Start();
             }
+            return true;
         }
 
-        private async void SetWallpaper()
+        private async void SetWallpaper(bool done)
         {
-            var dialog = new MessageDialog("");
+            if(done)
+            {
+                var dialog = new MessageDialog("");
             if (!UserProfilePersonalizationSettings.IsSupported())
             {
                 dialog.Content = "您的设备不支持自动更换壁纸";
@@ -145,7 +129,6 @@ namespace Pixiv_Wallpaper_for_Win10
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.Message);
                 timer.Interval = TimeSpan.FromSeconds(2);
                 timer.Start();
             }
@@ -174,10 +157,8 @@ namespace Pixiv_Wallpaper_for_Win10
             br.AlignmentY = AlignmentY.Top;
             br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
 
-            //gr.Background = br;
-
-            timer.Interval = TimeSpan.FromMinutes(c.time);
-            timer.Start();
+            }
+            
         }
 
             
@@ -198,9 +179,9 @@ namespace Pixiv_Wallpaper_for_Win10
             main.Navigate(typeof(SettingPage));
         }
 
-        private void next_btn_Click(object sender, RoutedEventArgs e)    //下一张图
+        private async void next_btn_Click(object sender, RoutedEventArgs e)    //下一张图
         {
-            update();
+            await update();
         }
 
         private async void visiturl_btn_Click(object sender, RoutedEventArgs e)       //访问p站
@@ -211,7 +192,8 @@ namespace Pixiv_Wallpaper_for_Win10
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            SetWallpaper();
+            SetWallpaper(true);
         }
+
     }
 }

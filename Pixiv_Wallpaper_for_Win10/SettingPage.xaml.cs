@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
 using Pixiv_Wallpaper_for_Win10.Util;
 using System.Collections.ObjectModel;
+using Windows.System;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -26,6 +27,7 @@ namespace Pixiv_Wallpaper_for_Win10
     public sealed partial class SettingPage : Page
     {
         ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;  //获取本地应用设置容器(单例)
+        StorageFolder folder = ApplicationData.Current.LocalFolder;
 
         public SettingPage()
         {
@@ -77,6 +79,20 @@ namespace Pixiv_Wallpaper_for_Win10
             localSettings.Values["Account"] = textbox1.Text;     //保存账号
             localSettings.Values["Password"] = passwordbox1.Password;    //保存密码
             localSettings.Values["Time"] = combox1.SelectedValue;    //保存时间
+        }
+
+        private async void openfilepath_Click(object sender, RoutedEventArgs e)
+        {
+            var t = new FolderLauncherOptions();
+            await Launcher.LaunchFolderAsync(folder, t);
+        }
+
+        private async void clear_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var f in await folder.GetItemsAsync())
+            {
+                await f.DeleteAsync();
+            }
         }
     }
 }

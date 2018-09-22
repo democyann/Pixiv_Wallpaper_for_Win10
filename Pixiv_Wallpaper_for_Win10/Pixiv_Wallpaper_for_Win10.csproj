@@ -20,7 +20,7 @@
     <PackageCertificateKeyFile>Pixiv_Wallpaper_for_Win10_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
     <PackageCertificateThumbprint>D8D23CB736732C1622D3A3D4689BC08CA40E7B4E</PackageCertificateThumbprint>
     <AppxPackageDir>I:\Visual Studio Works\</AppxPackageDir>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
@@ -166,6 +166,44 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="Microsoft.Midi.GmDls, Version=10.0.17134.0">
+      <Name>Microsoft General MIDI DLS for Universal Windows Apps %28Microsoft.Midi.GmDls, Version=10.0.17134.0%29</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.UniversalCRT.Debug, Version=10.0.17134.0">
+      <Name>Microsoft Universal CRT Debug Runtime</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.VCLibs, Version=14.0">
+      <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.VCLibs.120, Version=14.0">
+      <Name>Microsoft Visual C++ 2013 Runtime Package for Windows Universal</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.VCLibs.Desktop, Version=14.0">
+      <Name>Visual C++ 2015 UWP Desktop Runtime for native apps</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.VCLibs.Desktop.110, Version=14.0">
+      <Name>Visual C++ 2012 UWP Desktop Runtime for native apps</Name>
+    </SDKReference>
+    <SDKReference Include="MSTestFramework.Universal, Version=15.5">
+      <Name>MSTest for Managed Projects</Name>
+    </SDKReference>
+    <SDKReference Include="TestPlatform.Universal, Version=15.5">
+      <Name>Microsoft Visual Studio Test Core</Name>
+    </SDKReference>
+    <SDKReference Include="WindowsDesktop, Version=10.0.16299.0">
+      <Name>Windows Desktop Extensions for the UWP</Name>
+    </SDKReference>
+    <SDKReference Include="WindowsIoT, Version=10.0.16299.0">
+      <Name>Windows IoT Extensions for the UWP</Name>
+    </SDKReference>
+    <SDKReference Include="WindowsMobile, Version=10.0.17134.0">
+      <Name>Windows Mobile Extensions for the UWP</Name>
+    </SDKReference>
+    <SDKReference Include="WindowsTeam, Version=10.0.16299.0">
+      <Name>Windows Team Extensions for the UWP</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
