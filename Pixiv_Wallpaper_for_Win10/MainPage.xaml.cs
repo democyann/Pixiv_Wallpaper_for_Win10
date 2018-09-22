@@ -115,51 +115,51 @@ namespace Pixiv_Wallpaper_for_Win10
             if(done)
             {
                 var dialog = new MessageDialog("");
-            if (!UserProfilePersonalizationSettings.IsSupported())
-            {
-                dialog.Content = "您的设备不支持自动更换壁纸";
-                await dialog.ShowAsync();
-                return;
-            }
-            UserProfilePersonalizationSettings settings = UserProfilePersonalizationSettings.Current;
-            StorageFile file = null;
-            try
-            {
-                file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId));
-            }
-            catch (Exception e)
-            {
-                timer.Interval = TimeSpan.FromSeconds(2);
-                timer.Start();
-            }
-
-            if (c.lockscr)
-            {
-                //更换锁屏
-                bool lockscr = await settings.TrySetLockScreenImageAsync(file);
-                if (!lockscr)
+                if (!UserProfilePersonalizationSettings.IsSupported())
                 {
-                    dialog.Content = "更换锁屏操作失败。";
+                    dialog.Content = "您的设备不支持自动更换壁纸";
+                    await dialog.ShowAsync();
+                    return;
+                }
+                UserProfilePersonalizationSettings settings = UserProfilePersonalizationSettings.Current;
+                StorageFile file = null;
+                try
+                {
+                    file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId));
+                }
+                catch (Exception e)
+                {
+                    timer.Interval = TimeSpan.FromSeconds(2);
+                    timer.Start();
+                }
+
+                if (c.lockscr)
+                {
+                    //更换锁屏
+                    bool lockscr = await settings.TrySetLockScreenImageAsync(file);
+                    if (!lockscr)
+                    {
+                        dialog.Content = "更换锁屏操作失败。";
+                        await dialog.ShowAsync();
+                    }
+                }
+                //更换壁纸
+                bool deskscr = await settings.TrySetWallpaperImageAsync(file);
+
+                if (!deskscr)
+                {
+                    dialog.Content = "更换壁纸操作失败。";
                     await dialog.ShowAsync();
                 }
-            }
-            //更换壁纸
-            bool deskscr = await settings.TrySetWallpaperImageAsync(file);
-
-            if (!deskscr)
-            {
-                dialog.Content = "更换壁纸操作失败。";
-                await dialog.ShowAsync();
-            }
-            ImageBrush br = new ImageBrush();
-            br.Stretch = Stretch.UniformToFill;
-            br.AlignmentX = AlignmentX.Left;
-            br.AlignmentY = AlignmentY.Top;
-            br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
+                ImageBrush br = new ImageBrush();
+                br.Stretch = Stretch.UniformToFill;
+                br.AlignmentX = AlignmentX.Left;
+                br.AlignmentY = AlignmentY.Top;
+                br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
 
             }
-            
         }
+           
 
             
 
