@@ -28,6 +28,7 @@ namespace Pixiv_Wallpaper_for_Win10
     {
         ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;  //获取本地应用设置容器(单例)
         StorageFolder folder = ApplicationData.Current.LocalFolder;
+        Conf c = new Conf();
 
         public SettingPage()
         {
@@ -42,7 +43,6 @@ namespace Pixiv_Wallpaper_for_Win10
             combox1.Items.Add(new KeyValuePair<string, int>("60 分钟", 60));
 
             //值填充
-            Conf c = new Conf();
 
             combox1.SelectedValue = c.time;
 
@@ -89,9 +89,12 @@ namespace Pixiv_Wallpaper_for_Win10
 
         private async void clear_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var f in await folder.GetItemsAsync())
+            foreach (StorageFile f in await folder.GetItemsAsync())
             {
-                await f.DeleteAsync();
+                if(!f.Name.Equals(c.lastImg.imgId))
+                {
+                    await f.DeleteAsync();
+                }     
             }
         }
     }
