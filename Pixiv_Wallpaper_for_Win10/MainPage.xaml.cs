@@ -179,15 +179,15 @@ namespace Pixiv_Wallpaper_for_Win10
             main.Navigate(typeof(SettingPage));
         }
 
-        private async void next_btn_Click(object sender, RoutedEventArgs e)    //下一张图
+        private void next_btn_Click(object sender, RoutedEventArgs e)    //下一张图
         {
-            await update();
+            update();
         }
 
-        private async void visiturl_btn_Click(object sender, RoutedEventArgs e)       //访问p站
+        private void visiturl_btn_Click(object sender, RoutedEventArgs e)       //访问p站
         {
             var uriPixiv = new Uri(@"https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + img.imgId);
-            var visit = await Windows.System.Launcher.LaunchUriAsync(uriPixiv);
+            var visit = Windows.System.Launcher.LaunchUriAsync(uriPixiv);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)

@@ -111,7 +111,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     //UI code here
                     MessageDialog dialog = new MessageDialog("");
-                    dialog.Content=e.Message.ToString() + "请正确设置网络代理";
+                    dialog.Content=e.Message.ToString();
                     await dialog.ShowAsync();
                 });
 
@@ -171,7 +171,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     //UI code here
                     MessageDialog dialog = new MessageDialog("");
-                    dialog.Content = e.Message.ToString() + "请正确设置网络代理";
+                    dialog.Content = e.Message.ToString();
                     await dialog.ShowAsync();
                 });
                 return "ERROR";
