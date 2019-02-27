@@ -36,7 +36,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             "image/webp,image/apng,image/*,*/*;q=0.8"
         };
 
-        private static readonly String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+        private static readonly String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36";
 
 
         private string url;
@@ -52,6 +52,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// 获取或设置原引用地址
         /// </summary>
         public string referer { get; set; }
+
+        /// <summary>
+        /// 获取或设置认证网址
+        /// </summary>
+        public string authority { get; set; }
 
         /// <summary>
         /// 
@@ -76,9 +81,13 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
             request.Headers["Accept-Encoding"] = "gzip,deflate,sdch";
-            request.Headers["User-Agent"] = USER_AGENT;
+            request.UserAgent = USER_AGENT;
             request.Headers["Scheme"] = "https";
             request.Headers["Authority"] = "www.pixiv.net";
+            if (authority != null)
+            {
+                request.Headers["Authority"] = authority;
+            }           
             if (referer != null)
             {
                 request.Headers["Referer"] = referer;
@@ -114,7 +123,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     dialog.Content=e.Message.ToString();
                     await dialog.ShowAsync();
                 });
-
                 return "ERROR";
             }
         }
@@ -131,7 +139,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
             request.Headers["Accept-Encoding"] = "gzip,deflate,sdch";
-            request.Headers["User-Agent"] = USER_AGENT;
+            request.UserAgent = USER_AGENT;
             request.ContentType = "application/x-www-form-urlencoded";
             if (referer != null)
             {

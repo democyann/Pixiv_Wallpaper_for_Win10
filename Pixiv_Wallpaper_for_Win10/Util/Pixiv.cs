@@ -13,15 +13,15 @@ using Windows.UI.Xaml;
 
 namespace Pixiv_Wallpaper_for_Win10.Util
 {
-    class Pixiv
+    public class Pixiv
     {
-        private readonly String INDEX_URL = "https://www.pixiv.net";
-        private readonly String POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh&source=pc&view_type=page&ref=wwwtop_accounts_index";
-        private readonly String LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=zh";
-        private readonly String RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=1000&page=discovery&mode=all&tt=";
-        private readonly String ILLUST_URL = "https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
-        private readonly String DETA_URL = "https://api.imjad.cn/pixiv/v1/?type=illust&id=";
-        private readonly String RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
+        private readonly string INDEX_URL = "https://www.pixiv.net";
+        private readonly string POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh&source=pc&view_type=page&ref=wwwtop_accounts_index";
+        private readonly string LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=zh";
+        private readonly string RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=1000&page=discovery&mode=all&tt=";
+        private readonly string ILLUST_URL = "https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
+        private readonly string DETA_URL = "https://api.imjad.cn/pixiv/v1/?type=illust&id=";
+        private readonly string RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
         private Conf c;
 
         
@@ -68,15 +68,17 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// 获取POST KEY 私有方法
         /// </summary>
         /// <returns>POST KEY</returns>
-        private async Task<string> postKey()
+        public async Task<string> postKey()
         {
             string key = "";
             //获取POST KEY
 
             HttpUtil posturl = new HttpUtil(POST_KEY_URL, HttpUtil.Contype.HTML);
+            posturl.authority = "accounts.pixiv.net";
             string poststr = await posturl.GetDataAsync();
             if (!poststr.Equals("ERROR"))
             {
+                Console.WriteLine("postkey" + poststr);
                 Regex r = new Regex("name=\"post_key\"\\svalue=\"([a-z0-9]{32})\"", RegexOptions.Singleline);
                 if (r.IsMatch(poststr))
                 {
@@ -106,6 +108,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
             if (!data.Equals("ERROR"))
             {
+                Debug.Write("login:" + data);
                 dynamic o = JObject.Parse(data);
                 if (o.body.success != null)
                 {
@@ -144,12 +147,23 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             string data = await tokurl.GetDataAsync();
             if (!data.Equals("ERROR"))
             {
+                Console.WriteLine("token:" + data);
                 Regex r = new Regex("pixiv.context.token\\s=\\s\"([a-z0-9]{32})\"");
                 if (r.IsMatch(data))
                 {
                     token = r.Match(data).Groups[1].ToString();
                     f = true;
                 }
+            }
+            else
+            {
+                //使UI线程调用lambda表达式内的方法
+                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("get token failure");
+                    await dialog.ShowAsync();
+                });
             }
             return f;
         }
@@ -184,7 +198,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                 {
                     //UI code here
-                    MessageDialog dialog = new MessageDialog("update recomm list Error");
+                    MessageDialog dialog = new MessageDialog("update recomm list failure");
                     await dialog.ShowAsync();
                 });
 
