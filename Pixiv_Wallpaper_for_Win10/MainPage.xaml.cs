@@ -52,7 +52,14 @@ namespace Pixiv_Wallpaper_for_Win10
             timer.Tick += Timer_Tick;
             timer.Start();
 
-
+            if(c.proxy=="enable")
+            {
+                HttpUtil.proxyPort = c.proxy_port;
+            }
+            else
+            {
+                HttpUtil.proxyPort = null;
+            }
 
             if (c.lastImg != null) { 
                 ImageBrush br = new ImageBrush();

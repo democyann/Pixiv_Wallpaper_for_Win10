@@ -15,6 +15,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 {
     public class HttpUtil
     {
+        public HttpUtil()
+        {  
+        }
         public enum Contype
         {
             /// <summary>
@@ -38,10 +41,13 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
         private static readonly String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36";
 
-
         private string url;
         private Contype dataType;
 
+        /// <summary>
+        /// 设置或获取代理端口
+        /// </summary>
+        public static string proxyPort{ get; set; }
 
         /// <summary>
         /// 设置或获取Cookie
@@ -59,7 +65,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         public string authority { get; set; }
 
         /// <summary>
-        /// 
+        ///   
         /// </summary>
         /// <param name="url">要请求的 URL</param>
         /// <param name="dataType">要请求的 MIME 类型</param>
@@ -67,6 +73,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         {
             this.url = url;
             this.dataType = dataType;
+
+            ServicePointManager.ServerCertificateValidationCallback += (s, cert, chain, sslPolicyErrors) => true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         }
 
 
@@ -92,6 +101,12 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             {
                 request.Headers["Referer"] = referer;
             }
+            if(proxyPort!=null)
+            {
+                WebProxy proxy = new WebProxy("http://127.0.0.1:" + proxyPort, true);
+                request.Proxy = proxy;
+            }
+
             try
             {
                 HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
@@ -144,6 +159,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             if (referer != null)
             {
                 request.Headers["Referer"] = referer;
+            }
+            if (proxyPort != null)
+            {
+                WebProxy proxy = new WebProxy("http://127.0.0.1:" + proxyPort, true);
+                request.Proxy = proxy;
             }
 
             Stream write = await request.GetRequestStreamAsync();
@@ -199,6 +219,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
             request.Headers["Referer"] = referer;
+            if (proxyPort != null)
+            {
+                WebProxy proxy = new WebProxy("http://127.0.0.1:" + proxyPort, true);
+                request.Proxy = proxy;
+            }
 
             HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
 
@@ -238,6 +263,5 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return imgid;
 
         }
-
     }
 }

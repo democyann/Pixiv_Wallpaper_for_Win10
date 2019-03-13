@@ -171,5 +171,47 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 localSettings.Values["lastImg"] = JsonConvert.SerializeObject(value);
             }
         }
+
+        /// <summary>
+        /// HTTP代理开关
+        /// </summary>
+        public string proxy
+        {
+            get
+            {
+                if(localSettings.Values["proxy"] == null)
+                {
+                    return "disable";
+                }
+                else
+                {
+                    return localSettings.Values["proxy"].ToString();
+                }
+            }
+            set
+            {
+                localSettings.Values["proxy"] = JsonConvert.SerializeObject(value);
+            }
+        }
+
+        /// <summary>
+        /// 代理端口
+        /// </summary>
+        public string proxy_port
+        {
+            get
+            {
+                if (localSettings.Values["proxy_port"] == null)
+                {
+                    return null;
+                }
+                else
+                    return localSettings.Values["proxy_port"].ToString();
+            }
+            set
+            {
+                localSettings.Values["proxy_port"] = JsonConvert.SerializeObject(value);
+            }
+        }
     }
 }

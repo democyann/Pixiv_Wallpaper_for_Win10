@@ -35,12 +35,11 @@ namespace Pixiv_Wallpaper_for_Win10
             this.InitializeComponent();
             
             //下拉框初始化
-            combox1.Items.Add(new KeyValuePair<string, int>("1 分钟", 1));
-            combox1.Items.Add(new KeyValuePair<string, int>("5 分钟", 5));
             combox1.Items.Add(new KeyValuePair<string, int>("10 分钟", 10));
-            combox1.Items.Add(new KeyValuePair<string, int>("15 分钟", 15));
             combox1.Items.Add(new KeyValuePair<string, int>("30 分钟", 30));
             combox1.Items.Add(new KeyValuePair<string, int>("60 分钟", 60));
+            combox1.Items.Add(new KeyValuePair<string, int>("120 分钟", 120));
+            combox1.Items.Add(new KeyValuePair<string, int>("180 分钟", 180));
 
             //值填充
 
@@ -58,10 +57,27 @@ namespace Pixiv_Wallpaper_for_Win10
                     radiobutton1.IsChecked = true;
                     break;
             }
+
+            switch (c.proxy)
+            {
+                case "enable":
+                    radiobutton3.IsChecked = true;
+                    textbox3.IsEnabled = true;
+                    break;
+                case "disable":
+                    radiobutton4.IsChecked = true;
+                    textbox3.IsEnabled = false;
+                    break;
+                default:
+                    radiobutton4.IsChecked = true;
+                    textbox3.IsEnabled = false;
+                    break;
+            }
+
             lock_che.IsChecked = c.lockscr;
             textbox1.Text = c.account;
             passwordbox1.Password = c.password;
-
+            textbox3.Text = c.proxy_port;
 
         }
 
@@ -74,6 +90,22 @@ namespace Pixiv_Wallpaper_for_Win10
             if (radiobutton1.IsChecked == true)
             {
                 localSettings.Values["Mode"] = "Top_50";         //设置本地保存文件（模式）为TOP50
+            }
+            if(radiobutton3.IsChecked==true)
+            {
+                localSettings.Values["proxy"] = "enable";
+                if (textbox3.Text != null)
+                {
+                    localSettings.Values["proxy_port"] = textbox3.Text;
+                }
+                else
+                {
+                    radiobutton4.IsChecked = true;
+                }                   
+            }
+            if (radiobutton4.IsChecked == true)
+            {
+                localSettings.Values["proxy"] = "disable";
             }
             localSettings.Values["Lock"] = lock_che.IsChecked;
             localSettings.Values["Account"] = textbox1.Text;     //保存账号
@@ -96,6 +128,16 @@ namespace Pixiv_Wallpaper_for_Win10
                     await f.DeleteAsync();
                 }     
             }
+        }
+
+        private void Radiobutton3_Checked(object sender, RoutedEventArgs e)
+        {
+            textbox3.IsEnabled = true;
+        }
+
+        private void Radiobutton4_Checked(object sender, RoutedEventArgs e)
+        {
+            textbox3.IsEnabled = false;
         }
     }
 }
