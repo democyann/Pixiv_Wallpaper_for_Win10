@@ -29,11 +29,12 @@
                     <TextBlock Text="密码:" Margin="30,10,0,0" FontSize="15" RequestedTheme="Dark"/>
                     <PasswordBox x:Name="passwordbox1" Margin="10,10,0,0" Width="200"  RequestedTheme="Dark"/>
                 </StackPanel>
-                <TextBlock Text="图片缓存" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
+                <TextBlock Text="缓存数据" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
                 <TextBlock Text="此项操作可能需要管理员权限" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
                 <StackPanel Orientation="Horizontal">
-                    <Button Name="clear" Content="清空缓存" Margin="30,10,0,0" RequestedTheme="Dark" Click="clear_Click"/>
-                    <Button Name="openfilepath" Content="访问文件夹" Margin="30,10,0,0" Click="openfilepath_Click" RequestedTheme="Dark"/>
+                    <Button Name="clearpicture" Content="清空图片缓存" Margin="30,10,0,0" RequestedTheme="Dark" Click="clearpicture_Click"/>
+                    <Button Name="openfilepath" Content="访问图片文件夹" Margin="30,10,0,0" Click="openfilepath_Click" RequestedTheme="Dark"/>
+                    <Button Name="cleantoken" Content="清理token与cookie" Margin="30,10,0,0" Click="Cleantoken_Click" RequestedTheme="Dark"/>
                 </StackPanel>
                 <TextBlock Text="HTTP代理" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
                 <TextBlock Text="此项更改将在下一次启动程序时生效" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
