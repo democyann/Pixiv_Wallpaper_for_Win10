@@ -16,7 +16,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
     public class Pixiv
     {
         private readonly string INDEX_URL = "https://www.pixiv.net";
-        private readonly string POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh&source=pc&view_type=page&ref=wwwtop_accounts_index";
+        private readonly string POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh_tw&source=pc&view_type=page&ref=wwwtop_accounts_index";
         private readonly string LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=zh";
         private readonly string RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=1000&page=discovery&mode=all&tt=";
         private readonly string ILLUST_URL = "https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
@@ -75,6 +75,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
             HttpUtil posturl = new HttpUtil(POST_KEY_URL, HttpUtil.Contype.HTML);
             posturl.authority = "accounts.pixiv.net";
+            posturl.referer = "https://www.pixiv.net/";
             string poststr = await posturl.GetDataAsync();
             if (!poststr.Equals("ERROR"))
             {
