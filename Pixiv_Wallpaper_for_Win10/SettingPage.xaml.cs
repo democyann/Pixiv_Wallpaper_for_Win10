@@ -119,7 +119,7 @@ namespace Pixiv_Wallpaper_for_Win10
             await Launcher.LaunchFolderAsync(folder, t);
         }
 
-        private async void clearpicture_Click(object sender, RoutedEventArgs e)
+        private async void clear_Click(object sender, RoutedEventArgs e)
         {
             foreach (StorageFile f in await folder.GetItemsAsync())
             {
@@ -138,12 +138,6 @@ namespace Pixiv_Wallpaper_for_Win10
         private void Radiobutton4_Checked(object sender, RoutedEventArgs e)
         {
             textbox3.IsEnabled = false;
-        }
-
-        private void Cleantoken_Click(object sender, RoutedEventArgs e)
-        {
-            c.token = null;
-            c.cookie = null;
         }
     }
 }

@@ -103,9 +103,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             if(proxyPort!=null)
             {
-                int port = int.Parse(proxyPort);
-                WebProxy proxyObject = new WebProxy("127.0.0.1",port);
-                request.Proxy = proxyObject;
+                WebProxy proxy = new WebProxy("http://127.0.0.1:" + proxyPort, true);
+                request.Proxy = proxy;
             }
 
             try
@@ -163,9 +162,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             if (proxyPort != null)
             {
-                int port = int.Parse(proxyPort);
-                WebProxy proxyObject = new WebProxy("127.0.0.1", port);
-                request.Proxy = proxyObject;
+                WebProxy proxy = new WebProxy("http://127.0.0.1:" + proxyPort, true);
+                request.Proxy = proxy;
             }
 
             Stream write = await request.GetRequestStreamAsync();
@@ -223,9 +221,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Headers["Referer"] = referer;
             if (proxyPort != null)
             {
-                int port = int.Parse(proxyPort);
-                WebProxy proxyObject = new WebProxy("127.0.0.1", port);
-                request.Proxy = proxyObject;
+                WebProxy proxy = new WebProxy("http://127.0.0.1:" + proxyPort, true);
+                request.Proxy = proxy;
             }
 
             HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
