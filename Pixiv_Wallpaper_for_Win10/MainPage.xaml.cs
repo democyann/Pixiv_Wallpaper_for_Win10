@@ -21,6 +21,8 @@ using Windows.System.UserProfile;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Media.Imaging;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.ExtendedExecution;
+using Windows.UI.Core;
 
 namespace Pixiv_Wallpaper_for_Win10
 {
@@ -31,13 +33,13 @@ namespace Pixiv_Wallpaper_for_Win10
     public sealed partial class MainPage : Page
     {
         private DispatcherTimer timer;  //图片推送定时器
-        private DispatcherTimer li_uptimer; //列表更新定时器
 
         private Conf c;
         private PixivTop50 top50;
         private PixivLike like;
         private ImageInfo img;
         public static MainPage mp;
+        private ExtendedExecutionSession session;
 
         public MainPage()
         {
@@ -46,11 +48,13 @@ namespace Pixiv_Wallpaper_for_Win10
             c = new Conf();
             top50 = new PixivTop50();
             like = new PixivLike();
-
+            session = null;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMinutes(c.time);
             timer.Tick += Timer_Tick;
             timer.Start();
+
+            BeginExtendedExecution(); //申请后台常驻
 
             if(c.proxy=="enable")
             {
@@ -166,12 +170,59 @@ namespace Pixiv_Wallpaper_for_Win10
 
             }
         }
-           
+        private void ClearExtendedExecution()
+        {
+            if (session != null)
+            {
+                session.Revoked -= SessionRevoked;
+                session.Dispose();
+                session = null;
+            }
+        }
 
-            
+        private async void BeginExtendedExecution()
+        {
+            // The previous Extended Execution must be closed before a new one can be requested.
+            ClearExtendedExecution();
 
+            var newSession = new ExtendedExecutionSession();
+            newSession.Reason = ExtendedExecutionReason.Unspecified;
+            newSession.Description = "Raising periodic toasts";
+            newSession.Revoked += SessionRevoked;
+            ExtendedExecutionResult result = await newSession.RequestExtensionAsync();
 
-        private void Button_Click(object sender, RoutedEventArgs e)     //汉堡界面开关
+            switch(result)
+            {
+                case ExtendedExecutionResult.Allowed:
+                    Debug.WriteLine("Extended execution allowed.");
+                    session = newSession;
+                    break;
+                default:
+                case ExtendedExecutionResult.Denied:
+                    Debug.WriteLine("Extended execution denied.");
+                    newSession.Dispose();
+                    break;
+            }
+        }
+
+        private async void SessionRevoked(object sender, ExtendedExecutionRevokedEventArgs args)
+        {
+            //session被系统回收时记录原因，session被回收则无法保持后台运行
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                switch (args.Reason)
+                {
+                    case ExtendedExecutionRevokedReason.Resumed:
+                        Debug.WriteLine("Extended execution revoked due to returning to foreground.");
+                        break;
+                    case ExtendedExecutionRevokedReason.SystemPolicy:
+                        Debug.WriteLine("Extended execution revoked due to system policy.");
+                        break;
+                }
+            });
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)     //汉堡视图开关
         {
             lis.IsPaneOpen = !lis.IsPaneOpen;
         }
