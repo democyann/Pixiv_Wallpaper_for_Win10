@@ -102,11 +102,11 @@ namespace Pixiv_Wallpaper_for_Win10
                 case "Top_50":
                     await Task.Run(async () => { img = await top50.SelectArtWork(); });         
                     break;
-                case "You_Like":
+                case "You_Like_V1":
                     await Task.Run(async () => { img = await like.SelectArtWork(); });
                     break;
                 default:
-                    await Task.Run(async () => { img = await like.SelectArtWork(); });
+                    await Task.Run(async () => { img = await top50.SelectArtWork(); });
                     break;
             }
 
@@ -166,8 +166,10 @@ namespace Pixiv_Wallpaper_for_Win10
                 br.Stretch = Stretch.UniformToFill;
                 br.AlignmentX = AlignmentX.Left;
                 br.AlignmentY = AlignmentY.Top;
-                br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
-
+                if(img.imgId!=null)
+                {
+                    br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
+                }
             }
         }
         private void ClearExtendedExecution()
@@ -244,7 +246,7 @@ namespace Pixiv_Wallpaper_for_Win10
 
         private void visiturl_btn_Click(object sender, RoutedEventArgs e)       //访问p站
         {
-            var uriPixiv = new Uri(@"https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + img.imgId);
+            var uriPixiv = new Uri(@"https://www.pixiv.net/artworks/" + img.imgId);
             var visit = Windows.System.Launcher.LaunchUriAsync(uriPixiv);
         }
 

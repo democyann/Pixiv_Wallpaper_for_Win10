@@ -39,7 +39,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             "image/webp,image/apng,image/*,*/*;q=0.8"
         };
 
-        private static readonly String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36";
+        private static readonly String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36";
 
         private string url;
         private Contype dataType;
@@ -233,28 +233,24 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 Stream s = response.GetResponseStream();
-
-                if (await ApplicationData.Current.LocalFolder.TryGetItemAsync(imgid) == null)
+                StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(imgid, CreationCollisionOption.OpenIfExists);
+                Stream write = await file.OpenStreamForWriteAsync();
+                int l;
+                long a = 0;
+                do
                 {
-                    StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(imgid, CreationCollisionOption.OpenIfExists);
-                    Stream write = await file.OpenStreamForWriteAsync();
-                    int l;
-                    long a = 0;
-                    do
+                    byte[] temp = new byte[1024];
+                    l = s.Read(temp, 0, 1024);
+                    if (l > 0)
                     {
-                        byte[] temp = new byte[1024];
-                        l = s.Read(temp, 0, 1024);
-                        if (l > 0)
-                        {
-                            await write.WriteAsync(temp, 0, l);
-                        }
-                        a += l;
+                        await write.WriteAsync(temp, 0, l);
+                    }
+                    a += l;
 
-                    } while (l > 0);
+                } while (l > 0);
 
-                    write.Dispose();
-                    s.Dispose();
-                }
+                write.Dispose();
+                s.Dispose();
             }
             else
             {

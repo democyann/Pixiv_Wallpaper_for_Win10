@@ -11,8 +11,8 @@
     <AssemblyName>Pixiv_Wallpaper_for_Win10</AssemblyName>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17763.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.17134.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.18362.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -21,11 +21,12 @@
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>D8D23CB736732C1622D3A3D4689BC08CA40E7B4E</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>BE871D628CD9F59B8F637D522A26B1D06BC42686</PackageCertificateThumbprint>
     <AppxPackageDir>I:\Visual Studio Works\</AppxPackageDir>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppInstallerUpdateFrequency>1</AppInstallerUpdateFrequency>
     <AppInstallerCheckForUpdateFrequency>OnApplicationRun</AppInstallerCheckForUpdateFrequency>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -119,6 +120,7 @@
     <Compile Include="Util\Pixiv.cs" />
     <Compile Include="Util\pixivLike.cs" />
     <Compile Include="Util\PixivTop50.cs" />
+    <Compile Include="Util\WebViewLogin.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -161,10 +163,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.1.5</Version>
+      <Version>6.2.9</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>11.0.2</Version>
+      <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="PixivCS">
+      <Version>0.4.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -186,22 +191,13 @@
     <SDKReference Include="Microsoft.VCLibs.Desktop.110, Version=14.0">
       <Name>Visual C++ 2012 UWP Desktop Runtime for native apps</Name>
     </SDKReference>
-    <SDKReference Include="MSTestFramework.Universal, Version=15.5">
-      <Name>MSTest for Managed Projects</Name>
-    </SDKReference>
-    <SDKReference Include="TestPlatform.Universal, Version=15.5">
-      <Name>Microsoft Visual Studio Test Core</Name>
-    </SDKReference>
-    <SDKReference Include="WindowsDesktop, Version=10.0.17763.0">
+    <SDKReference Include="WindowsDesktop, Version=10.0.18362.0">
       <Name>Windows Desktop Extensions for the UWP</Name>
     </SDKReference>
-    <SDKReference Include="WindowsIoT, Version=10.0.16299.0">
-      <Name>Windows IoT Extensions for the UWP</Name>
-    </SDKReference>
-    <SDKReference Include="WindowsMobile, Version=10.0.17763.0">
+    <SDKReference Include="WindowsMobile, Version=10.0.18362.0">
       <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
-    <SDKReference Include="WindowsTeam, Version=10.0.17763.0">
+    <SDKReference Include="WindowsTeam, Version=10.0.18362.0">
       <Name>Windows Team Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>

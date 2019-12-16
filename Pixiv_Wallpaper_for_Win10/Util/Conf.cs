@@ -203,7 +203,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             {
                 if (localSettings.Values["proxy_port"] == null)
                 {
-                    return null;
+                    return "";
                 }
                 else
                     return localSettings.Values["proxy_port"].ToString();

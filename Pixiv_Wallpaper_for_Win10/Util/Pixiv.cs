@@ -17,22 +17,13 @@ namespace Pixiv_Wallpaper_for_Win10.Util
     {
         private readonly string INDEX_URL = "https://www.pixiv.net";
         private readonly string POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh_tw&source=pc&view_type=page&ref=wwwtop_accounts_index";
-        private readonly string LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=zh";
+        private readonly string LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=ja";
         private readonly string RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=1000&page=discovery&mode=all&tt=";
-        private readonly string ILLUST_URL = "https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
         private readonly string DETA_URL = "https://api.imjad.cn/pixiv/v1/?type=illust&id=";
         private readonly string RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
-        private Conf c;
-
-        
 
         public string cookie { get; set; }
         public string token { get; set; }
-
-        public Pixiv()
-        {
-            c = new Conf();
-        }
 
         /// <summary>
         /// 获取TOP 50推荐列表
@@ -65,85 +56,14 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         }
 
         /// <summary>
-        /// 获取POST KEY 私有方法
-        /// </summary>
-        /// <returns>POST KEY</returns>
-        public async Task<string> postKey()
-        {
-            string key = "";
-            //获取POST KEY
-
-            HttpUtil posturl = new HttpUtil(POST_KEY_URL, HttpUtil.Contype.HTML);
-            posturl.authority = "accounts.pixiv.net";
-            posturl.referer = "https://www.pixiv.net/";
-            string poststr = await posturl.GetDataAsync();
-            if (!poststr.Equals("ERROR"))
-            {
-                Console.WriteLine("postkey" + poststr);
-                Regex r = new Regex("name=\"post_key\"\\svalue=\"([a-z0-9]{32})\"", RegexOptions.Singleline);
-                if (r.IsMatch(poststr))
-                {
-                    key = r.Match(poststr).Groups[1].ToString();
-                    cookie = posturl.cookie;
-                }
-            }
-            return key;
-        }
-
-        /// <summary>
-        /// 登录
-        /// </summary>
-        /// <returns>true 登录成功 false 登录失败</returns>
-        private async Task<bool> login()
-        {
-            bool f = false;
-            string postkey = await postKey();
-            HttpUtil loginurl = new HttpUtil(LOGIN_URL, HttpUtil.Contype.JSON);
-            loginurl.cookie = cookie;
-            string pram = "pixiv_id=" + c.account
-                        + "&password=" + c.password
-                        + "&captcha=&g_recaptcha_response=&post_key=" + postkey
-                        + "&source=pc&ref=wwwtop_accounts_index&return_to=http://www.pixiv.net/";
-
-            string data = await loginurl.PostDataAsync(pram);
-
-            if (!data.Equals("ERROR"))
-            {
-                Debug.Write("login:" + data);
-                dynamic o = JObject.Parse(data);
-                if (o.body.success != null)
-                {
-                    cookie = loginurl.cookie;
-                    f = true;
-                }
-                else
-                {
-                    //使UI线程调用lambda表达式内的方法
-                    await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async() => 
-                    {
-                        //UI code here
-                        MessageDialog dialog = new MessageDialog("登录失败,请输入正确的账号密码");
-                        await dialog.ShowAsync();
-                    });
-                }
-            }
-            return f;
-        }
-
-        /// <summary>
         /// 获取Token
         /// </summary>
-        /// <param name="flag">true 登录获取，false 不登录获取</param>
         /// <returns></returns>
-        public async Task<bool> getToken(bool flag = false)
+        public async Task<bool> getToken(string cookie)
         {
             bool f = false;
-            if (flag)
-            {
-                if (!await login()) return f;                //如果没登录成功，返回结果false
-            }
-
             HttpUtil tokurl = new HttpUtil(INDEX_URL, HttpUtil.Contype.HTML);
+            this.cookie = cookie;
             tokurl.cookie = cookie;
             string data = await tokurl.GetDataAsync();
             if (!data.Equals("ERROR"))
@@ -174,7 +94,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// </summary>
         /// <returns></returns>
 
-        public async Task<ArrayList> getRecommlist()
+        public async Task<ArrayList> getRecommlistV1()
         {
             string like;
             ArrayList list = new ArrayList();
@@ -193,26 +113,15 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     list.Add(j.ToString());
                 }
             }
-            else
-            {
-                //使UI线程调用lambda表达式内的方法
-                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
-                {
-                    //UI code here
-                    MessageDialog dialog = new MessageDialog("update recomm list failure");
-                    await dialog.ShowAsync();
-                });
-
-            }
     
             return list;
         }
         /// <summary>
-        /// 图片信息查询子方法1(R18作品无法查询地址)
+        /// 图片信息查询子方法1
         /// </summary>
         /// <param name="imgid">要查找的作品ID</param>
         /// <returns></returns>
-        private async Task<string> getImageInfoSub1(string imgid)
+        private async Task<string> getImageInfoSub(string imgid)
         {
             HttpUtil info1 = new HttpUtil(DETA_URL + imgid, HttpUtil.Contype.JSON);
             string data = await info1.GetDataAsync();
@@ -228,7 +137,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         public async Task<ImageInfo> getImageInfo(string id)
         {
             ImageInfo imginfo = null;
-            string info1 = await getImageInfoSub1(id);
+            string info1 = await getImageInfoSub(id);
             if (!info1.Equals("ERROR"))
             {
                 imginfo = new ImageInfo();
@@ -257,7 +166,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 imginfo.width = (int)ill[0]["width"];
 
             }
-
             return imginfo;
         }
 
@@ -272,8 +180,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             img.imgUrl = reg.Replace(img.imgUrl, "/img-master", 1);
 
             HttpUtil download = new HttpUtil(img.imgUrl, HttpUtil.Contype.IMG);
-            download.referer = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + img.imgId;
-            download.cookie = c.cookie;
+            download.referer = "https://www.pixiv.net/artworks/" + img.imgId;
+            download.cookie = cookie;
             string path = await download.ImageDownloadAsync(img.imgId);
             return path;
         }

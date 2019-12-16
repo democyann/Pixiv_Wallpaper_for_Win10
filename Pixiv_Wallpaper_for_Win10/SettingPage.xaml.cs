@@ -50,8 +50,14 @@ namespace Pixiv_Wallpaper_for_Win10
                 case "Top_50":
                     radiobutton1.IsChecked = true;
                     break;
-                case "You_Like":
+                case "You_Like_V1":
                     radiobutton2.IsChecked = true;
+                    textbox1.IsEnabled = false;
+                    passwordbox1.IsEnabled = false;
+                    break;
+                case "You_Like_V2":
+                    radiobutton3.IsChecked = true;
+                    loginV1.IsEnabled = false;
                     break;
                 default:
                     radiobutton1.IsChecked = true;
@@ -61,37 +67,49 @@ namespace Pixiv_Wallpaper_for_Win10
             switch (c.proxy)
             {
                 case "enable":
-                    radiobutton3.IsChecked = true;
+                    radiobutton4.IsChecked = true;
                     textbox3.IsEnabled = true;
                     break;
                 case "disable":
-                    radiobutton4.IsChecked = true;
+                    radiobutton5.IsChecked = true;
                     textbox3.IsEnabled = false;
                     break;
                 default:
-                    radiobutton4.IsChecked = true;
+                    radiobutton5.IsChecked = true;
                     textbox3.IsEnabled = false;
                     break;
+            }
+
+            if(c.cookie!=null)
+            {
+                loginV1.Content = "已登录";
+            }
+            else
+            {
+                loginV1.Content = "请登录";
             }
 
             lock_che.IsChecked = c.lockscr;
             textbox1.Text = c.account;
             passwordbox1.Password = c.password;
             textbox3.Text = c.proxy_port;
-
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             if (radiobutton2.IsChecked == true)
             {
-                localSettings.Values["Mode"] = "You_Like";        //设置本地保存文件（模式）为猜你喜欢
+                localSettings.Values["Mode"] = "You_Like_V1";        //设置本地保存文件（模式）为猜你喜欢
             }
             if (radiobutton1.IsChecked == true)
             {
                 localSettings.Values["Mode"] = "Top_50";         //设置本地保存文件（模式）为TOP50
             }
             if(radiobutton3.IsChecked==true)
+            {
+                localSettings.Values["mode"] = "You_Like_V2";
+            }
+            if(radiobutton4.IsChecked==true)
             {
                 localSettings.Values["proxy"] = "enable";
                 if (textbox3.Text != null)
@@ -100,10 +118,10 @@ namespace Pixiv_Wallpaper_for_Win10
                 }
                 else
                 {
-                    radiobutton4.IsChecked = true;
+                    radiobutton5.IsChecked = true;
                 }                   
             }
-            if (radiobutton4.IsChecked == true)
+            if (radiobutton5.IsChecked == true)
             {
                 localSettings.Values["proxy"] = "disable";
             }
@@ -113,13 +131,19 @@ namespace Pixiv_Wallpaper_for_Win10
             localSettings.Values["Time"] = combox1.SelectedValue;    //保存时间
         }
 
-        private async void openfilepath_Click(object sender, RoutedEventArgs e)
+        private void SetCookie(string str)
+        {
+            c.cookie = str;
+            loginV1.Content = "已登录";
+        }
+
+        private async void openFilePath_Click(object sender, RoutedEventArgs e)
         {
             var t = new FolderLauncherOptions();
             await Launcher.LaunchFolderAsync(folder, t);
         }
 
-        private async void clearpicture_Click(object sender, RoutedEventArgs e)
+        private async void clearPicture_Click(object sender, RoutedEventArgs e)
         {
             foreach (StorageFile f in await folder.GetItemsAsync())
             {
@@ -140,10 +164,21 @@ namespace Pixiv_Wallpaper_for_Win10
             textbox3.IsEnabled = false;
         }
 
-        private void Cleantoken_Click(object sender, RoutedEventArgs e)
+        private void cleanToken_Click(object sender, RoutedEventArgs e)
         {
             c.token = null;
             c.cookie = null;
+            loginV1.Content = "未登录";
+        }
+
+        private async void loginV1_Click(object sender, RoutedEventArgs e)
+        {
+            WebViewLogin wvl = new WebViewLogin(900, 600);
+            wvl.targetUri = "https://www.pixiv.net/";
+            wvl.loginUri = "https://accounts.pixiv.net/login";
+            wvl.ClearCookies();
+            wvl.Method += SetCookie;
+            await wvl.ShowWebView();
         }
     }
 }
