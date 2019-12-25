@@ -45,25 +45,6 @@ namespace Pixiv_Wallpaper_for_Win10
 
             combox1.SelectedValue = c.time;
 
-            switch (c.mode)
-            {
-                case "Top_50":
-                    radiobutton1.IsChecked = true;
-                    break;
-                case "You_Like_V1":
-                    radiobutton2.IsChecked = true;
-                    textbox1.IsEnabled = false;
-                    passwordbox1.IsEnabled = false;
-                    break;
-                case "You_Like_V2":
-                    radiobutton3.IsChecked = true;
-                    loginV1.IsEnabled = false;
-                    break;
-                default:
-                    radiobutton1.IsChecked = true;
-                    break;
-            }
-
             switch (c.proxy)
             {
                 case "enable":
@@ -93,13 +74,38 @@ namespace Pixiv_Wallpaper_for_Win10
             textbox1.Text = c.account;
             passwordbox1.Password = c.password;
             textbox3.Text = c.proxy_port;
+
+            switch (c.mode)
+            {
+                case "Top_50":
+                    radiobutton1.IsChecked = true;
+                    textbox1.IsEnabled = false;
+                    passwordbox1.IsEnabled = false;
+                    loginV1.IsEnabled = false;
+                    break;
+                case "You_Like_V1":
+                    radiobutton2.IsChecked = true;
+                    textbox1.IsEnabled = false;
+                    passwordbox1.IsEnabled = false;
+                    loginV1.IsEnabled = true;
+                    break;
+                case "You_Like_V2":
+                    radiobutton3.IsChecked = true;
+                    loginV1.IsEnabled = false;
+                    textbox1.IsEnabled = true;
+                    passwordbox1.IsEnabled = true;
+                    break;
+                default:
+                    radiobutton1.IsChecked = true;
+                    break;
+            }
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             if (radiobutton2.IsChecked == true)
             {
-                localSettings.Values["Mode"] = "You_Like_V1";        //设置本地保存文件（模式）为猜你喜欢
+                localSettings.Values["Mode"] = "You_Like_V1";        //设置本地保存文件（模式）为猜你喜欢(Webview)
             }
             if (radiobutton1.IsChecked == true)
             {
@@ -107,7 +113,7 @@ namespace Pixiv_Wallpaper_for_Win10
             }
             if(radiobutton3.IsChecked==true)
             {
-                localSettings.Values["mode"] = "You_Like_V2";
+                localSettings.Values["Mode"] = "You_Like_V2";   //设置本地保存文件 (模式) 为猜你喜欢(PixivCS)
             }
             if(radiobutton4.IsChecked==true)
             {
@@ -154,12 +160,12 @@ namespace Pixiv_Wallpaper_for_Win10
             }
         }
 
-        private void Radiobutton3_Checked(object sender, RoutedEventArgs e)
+        private void Radiobutton4_Checked(object sender, RoutedEventArgs e)
         {
             textbox3.IsEnabled = true;
         }
 
-        private void Radiobutton4_Checked(object sender, RoutedEventArgs e)
+        private void Radiobutton5_Checked(object sender, RoutedEventArgs e)
         {
             textbox3.IsEnabled = false;
         }
@@ -179,6 +185,52 @@ namespace Pixiv_Wallpaper_for_Win10
             wvl.ClearCookies();
             wvl.Method += SetCookie;
             await wvl.ShowWebView();
+        }
+
+        private void radiobutton1_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(radiobutton1.IsChecked==true)
+            {
+                if (textbox1.Text == null)
+                {
+                    textbox1.Text = "";
+                }
+                if (passwordbox1.Password == null)
+                {
+                    passwordbox1.Password = "";
+                }
+                textbox1.IsEnabled = false;
+                passwordbox1.IsEnabled = false;
+                loginV1.IsEnabled = false;
+            }
+        }
+
+        private void radiobutton2_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(radiobutton2.IsChecked==true)
+            {
+                if (textbox1.Text == null)
+                {
+                    textbox1.Text = "";
+                }
+                if (passwordbox1.Password == null)
+                {
+                    passwordbox1.Password = "";
+                }
+                textbox1.IsEnabled = false;
+                passwordbox1.IsEnabled = false;
+                loginV1.IsEnabled = true;
+            }   
+        }
+
+        private void radiobutton3_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(radiobutton3.IsChecked==true)
+            {
+                textbox1.IsEnabled = true;
+                passwordbox1.IsEnabled = true;
+                loginV1.IsEnabled = false;
+            }            
         }
     }
 }

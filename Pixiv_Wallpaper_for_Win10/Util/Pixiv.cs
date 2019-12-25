@@ -10,29 +10,37 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
+using Windows.Data.Json;
+using PixivCS;
+using System.Collections.Concurrent;
 
 namespace Pixiv_Wallpaper_for_Win10.Util
 {
     public class Pixiv
     {
         private readonly string INDEX_URL = "https://www.pixiv.net";
-        private readonly string POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh_tw&source=pc&view_type=page&ref=wwwtop_accounts_index";
-        private readonly string LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=ja";
         private readonly string RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=1000&page=discovery&mode=all&tt=";
         private readonly string DETA_URL = "https://api.imjad.cn/pixiv/v1/?type=illust&id=";
         private readonly string RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
 
         public string cookie { get; set; }
         public string token { get; set; }
+        private string nexturl { get; set; }
+        private PixivBaseAPI baseAPI;
+        public Pixiv()
+        {
+            baseAPI = new PixivBaseAPI();
+        }
+
 
         /// <summary>
         /// 获取TOP 50推荐列表
         /// </summary>
         /// <returns></returns>
-        public async Task<ArrayList> getRallist()
+        public async Task<ConcurrentQueue<string>> getRallist()
         {
             string rall;
-            ArrayList list = new ArrayList();
+            ConcurrentQueue<string> queue = new ConcurrentQueue<string>();
             HttpUtil top50 = new HttpUtil(RALL_URL, HttpUtil.Contype.JSON);
 
             rall = await top50.GetDataAsync();
@@ -44,7 +52,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
                 foreach (JToken j in arr)
                 {
-                    list.Add(j["illust_id"].ToString());
+                    queue.Enqueue(j["illust_id"].ToString());
                 }
             }
             else
@@ -52,7 +60,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 MessageDialog dialog = new MessageDialog("update rall list Error");
                 await dialog.ShowAsync();
             }
-            return list;
+            return queue;
         }
 
         /// <summary>
@@ -94,10 +102,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// </summary>
         /// <returns></returns>
 
-        public async Task<ArrayList> getRecommlistV1()
+        public async Task<ConcurrentQueue<string>> getRecommlistV1()
         {
             string like;
-            ArrayList list = new ArrayList();
+            ConcurrentQueue<string> queue = new ConcurrentQueue<string>();
             HttpUtil recomm = new HttpUtil(RECOMM_URL + token, HttpUtil.Contype.JSON);
             recomm.cookie = cookie;
             recomm.referer = "https://www.pixiv.net/discovery";
@@ -110,12 +118,61 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 JArray arr = o.recommendations;
                 foreach (JToken j in arr)
                 {
-                    list.Add(j.ToString());
+                    queue.Enqueue(j.ToString());
                 }
             }
     
-            return list;
+            return queue;
         }
+
+        public async Task<ConcurrentQueue<ImageInfo>> getRecommenlistV2(string account = null, string password = null)
+        {
+            ConcurrentQueue<ImageInfo> queue = new ConcurrentQueue<ImageInfo>();
+            JsonObject recommends = new JsonObject();
+            if (baseAPI.AccessToken == null)
+            {
+                try
+                {
+                    JsonObject baseRes = null;
+                    baseRes = await baseAPI.Auth(account, password);
+                    string db = baseRes.ToString();
+                    Debug.Write(db);
+                }
+                catch (PixivException e)
+                {
+                    //使UI线程调用lambda表达式内的方法
+                    await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                    {
+                        //UI code here
+                        MessageDialog dialog = new MessageDialog(e.Message);
+                        await dialog.ShowAsync();
+                    });
+                    return null;
+                }
+            }
+            //使用nexturl更新list
+            recommends = await new PixivAppAPI(baseAPI).IllustRecommended();//账号密码错误将会弹PixivException
+            string str = recommends["illusts"].ToString();
+            nexturl = recommends["next_url"].ToString();
+            JArray arr = JArray.Parse(recommends["illusts"].ToString());
+            foreach (JToken ill in arr)
+            {
+                ImageInfo imginfo = new ImageInfo();
+                imginfo.viewCount = (int)ill["total_view"];
+                imginfo.imgUrl = ill["image_urls"]["large"].ToString();
+                imginfo.isR18 = false;
+                imginfo.userId = ill["user"]["id"].ToString();
+                imginfo.userName = ill["user"]["account"].ToString();
+                imginfo.imgId = ill["id"].ToString();
+                imginfo.imgName = ill["title"].ToString();
+                imginfo.height = (int)ill["height"];
+                imginfo.width = (int)ill["width"];
+
+                queue.Enqueue(imginfo);
+            }
+            return queue;
+        }
+
         /// <summary>
         /// 图片信息查询子方法1
         /// </summary>
@@ -155,13 +212,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                         imginfo.isR18 = true;
                         break;
                 }
-
-                dynamic user = ill[0]["user"].ToString();
                 imginfo.userId = ill[0]["user"]["id"].ToString();
                 imginfo.userName = ill[0]["user"]["name"].ToString();
                 imginfo.imgId = ill[0]["id"].ToString() ;
                 imginfo.imgName = ill[0]["title"].ToString();
-                imginfo.tag = ill[0]["tags"].ToString();
                 imginfo.height = (int)ill[0]["height"];
                 imginfo.width = (int)ill[0]["width"];
 

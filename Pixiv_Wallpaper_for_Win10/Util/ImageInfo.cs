@@ -36,10 +36,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// </summary>
         public bool isR18 { get; set; }
         /// <summary>
-        /// 作品tags
-        /// </summary>
-        public string tag { get; set; }
-        /// <summary>
         /// 浏览数
         /// </summary>
         public int viewCount { get; set; }

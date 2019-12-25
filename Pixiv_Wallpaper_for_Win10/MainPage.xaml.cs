@@ -35,19 +35,19 @@ namespace Pixiv_Wallpaper_for_Win10
         private DispatcherTimer timer;  //图片推送定时器
 
         private Conf c;
-        private PixivTop50 top50;
-        private PixivLike like;
         private ImageInfo img;
         public static MainPage mp;
         private ExtendedExecutionSession session;
+        private PixivTop50 top50;
+        private PixivLike like;
 
         public MainPage()
         {
             this.InitializeComponent();
             mp = this;
-            c = new Conf();
             top50 = new PixivTop50();
             like = new PixivLike();
+            c = new Conf();
             session = null;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMinutes(c.time);
@@ -103,7 +103,10 @@ namespace Pixiv_Wallpaper_for_Win10
                     await Task.Run(async () => { img = await top50.SelectArtWork(); });         
                     break;
                 case "You_Like_V1":
-                    await Task.Run(async () => { img = await like.SelectArtWork(); });
+                    await Task.Run(async () => { img = await like.SelectArtWorkV1(); });
+                    break;
+                case "You_Like_V2":
+                    await Task.Run(async () => { img = await like.SelectArtWorkV2(); });
                     break;
                 default:
                     await Task.Run(async () => { img = await top50.SelectArtWork(); });
@@ -250,10 +253,28 @@ namespace Pixiv_Wallpaper_for_Win10
             var visit = Windows.System.Launcher.LaunchUriAsync(uriPixiv);
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void setWallpaper_btn_Click(object sender, RoutedEventArgs e)
         {
             SetWallpaper(true);
         }
 
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            switch(c.mode)
+            {
+                case "Top_50":
+                    await Task.Run(async () => { await top50.listUpdate(true); });
+                    break;
+                case "You_Like_V1":
+                    await Task.Run(async () => { await like.ListUpdateV1(true); });
+                    break;
+                case "You_Like_V2":
+                    await Task.Run(async () => { await like.ListUpdateV2(true); });
+                    break;
+                default:
+                    await Task.Run(async () => { await top50.listUpdate(true); });
+                    break;
+            }
+        }
     }
 }
