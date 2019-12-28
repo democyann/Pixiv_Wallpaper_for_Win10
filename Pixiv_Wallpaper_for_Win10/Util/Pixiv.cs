@@ -257,7 +257,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// </summary>
         /// <param name="img">要下载的图片信息</param>
         /// <returns></returns>
-        public async Task<string> downloadImg(ImageInfo img)
+        public async Task downloadImg(ImageInfo img)
         {
             Regex reg = new Regex("/c/[0-9]+x[0-9]+/img-master");
             img.imgUrl = reg.Replace(img.imgUrl, "/img-master", 1);
@@ -265,8 +265,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             HttpUtil download = new HttpUtil(img.imgUrl, HttpUtil.Contype.IMG);
             download.referer = "https://www.pixiv.net/artworks/" + img.imgId;
             download.cookie = cookie;
-            string path = await download.ImageDownloadAsync(img.imgId);
-            return path;
+            await download.ImageDownloadAsync(img.imgId);
         }
 
         public async Task downloadImgV2(ImageInfo img)
