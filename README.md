@@ -6,4 +6,4 @@
 预览图:
 ![Image text](https://github.com/democyann/Pixiv_Wallpaper_for_Win10/blob/relife/Pixiv_Wallpaper_for_Win10/preview_img/N8QG~I%7BTZK%5B115CMF60BCX0.png)
 
-![Image text](https://github.com/democyann/Pixiv_Wallpaper_for_Win10/blob/relife/Pixiv_Wallpaper_for_Win10/preview_img/RX5E%40ZD%5B7_%60(%25~PYAAY%25%60P5.png)
+![Image text](https://raw.githubusercontent.com/democyann/Pixiv_Wallpaper_for_Win10/relife/Pixiv_Wallpaper_for_Win10/preview_img/RX5E%40ZD%5B7_%60(%25~PYAAY%25%60P5.png)
