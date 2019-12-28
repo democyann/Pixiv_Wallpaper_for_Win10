@@ -248,7 +248,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     a += l;
 
                 } while (l > 0);
-
                 write.Dispose();
                 s.Dispose();
             }

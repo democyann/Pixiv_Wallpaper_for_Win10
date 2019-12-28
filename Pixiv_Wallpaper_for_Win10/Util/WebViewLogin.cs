@@ -14,8 +14,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 {
     class WebViewLogin
     {
-        public string loginUri { get; set; }
-        public string targetUri { get; set; }
+        private string loginUri;
+        private string targetUri;
         public delegate void OutputCookie(string str);
         public OutputCookie Method;//需要在调用方实现此委托方法，以实现cookie的赋值
 
@@ -24,18 +24,20 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         private AppWindow appWindow;
         private HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
 
-        public WebViewLogin(int width, int height)
+        public WebViewLogin(string loginUri,string targetUri)
         {
             filter.UseProxy = true;
+            webView.NavigationStarting += WebView_NavigationStarting;
+            this.loginUri = loginUri;
+            this.targetUri = targetUri;
+        }
+
+        public async Task ShowWebView(int width,int height)
+        {
+            appWindow = await AppWindow.TryCreateAsync();
             webView.Width = width;
             webView.Height = height;
             appWindow.RequestSize(new Windows.Foundation.Size(width, height));
-            webView.NavigationStarting += WebView_NavigationStarting;
-        }
-
-        public async Task ShowWebView()
-        {
-            appWindow = await AppWindow.TryCreateAsync();
             ElementCompositionPreview.SetAppWindowContent(appWindow, webView);
 
             httpRequestMessage.Method = HttpMethod.Get;

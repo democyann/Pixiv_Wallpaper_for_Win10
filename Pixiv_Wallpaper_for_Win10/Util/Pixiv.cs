@@ -13,6 +13,8 @@ using Windows.UI.Xaml;
 using Windows.Data.Json;
 using PixivCS;
 using System.Collections.Concurrent;
+using System.Web;
+using System.IO;
 
 namespace Pixiv_Wallpaper_for_Win10.Util
 {
@@ -25,7 +27,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
         public string cookie { get; set; }
         public string token { get; set; }
-        private string nexturl { get; set; }
+        private string nexturl = "begin";
         private PixivBaseAPI baseAPI;
         public Pixiv()
         {
@@ -98,7 +100,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         }
 
         /// <summary>
-        /// 获取"猜你喜欢"推荐列表
+        /// 获取"猜你喜欢"推荐列表(Web模拟)
         /// </summary>
         /// <returns></returns>
 
@@ -125,6 +127,12 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return queue;
         }
 
+        /// <summary>
+        /// 获取"猜你喜欢"(PixivCS Api)
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public async Task<ConcurrentQueue<ImageInfo>> getRecommenlistV2(string account = null, string password = null)
         {
             ConcurrentQueue<ImageInfo> queue = new ConcurrentQueue<ImageInfo>();
@@ -138,37 +146,58 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     string db = baseRes.ToString();
                     Debug.Write(db);
                 }
-                catch (PixivException e)
+                catch (Exception e)
                 {
-                    //使UI线程调用lambda表达式内的方法
-                    await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
-                    {
-                        //UI code here
-                        MessageDialog dialog = new MessageDialog(e.Message);
-                        await dialog.ShowAsync();
-                    });
+                    Debug.WriteLine(e.Message);
                     return null;
                 }
             }
-            //使用nexturl更新list
-            recommends = await new PixivAppAPI(baseAPI).IllustRecommended();//账号密码错误将会弹PixivException
-            string str = recommends["illusts"].ToString();
-            nexturl = recommends["next_url"].ToString();
-            JArray arr = JArray.Parse(recommends["illusts"].ToString());
-            foreach (JToken ill in arr)
+            //是否使用nexturl更新list
+            if ("begin".Equals(nexturl))
             {
-                ImageInfo imginfo = new ImageInfo();
-                imginfo.viewCount = (int)ill["total_view"];
-                imginfo.imgUrl = ill["image_urls"]["large"].ToString();
-                imginfo.isR18 = false;
-                imginfo.userId = ill["user"]["id"].ToString();
-                imginfo.userName = ill["user"]["account"].ToString();
-                imginfo.imgId = ill["id"].ToString();
-                imginfo.imgName = ill["title"].ToString();
-                imginfo.height = (int)ill["height"];
-                imginfo.width = (int)ill["width"];
+                recommends = await new PixivAppAPI(baseAPI).IllustRecommended();
+            }
+            else
+            {
+                Uri next = new Uri(nexturl);
+                string getparam(string param) => HttpUtility.ParseQueryString(next.Query).Get(param);
+                recommends = await new PixivAppAPI(baseAPI).IllustRecommended
+                    (ContentType: getparam("content_type"),
+                     IncludeRankingLabel: bool.Parse(getparam("include_ranking_label")),
+                     Filter: getparam("filter"),
+                     MinBookmarkIDForRecentIllust: getparam("min_bookmark_id_for_recent_illust"),
+                     MaxBookmarkIDForRecommended: getparam("max_bookmark_id_for_recommend"),
+                     Offset: getparam("offset"),
+                     IncludeRankingIllusts: bool.Parse(getparam("include_ranking_illusts")),
+                     IncludePrivacyPolicy: getparam("include_privacy_policy"));
+            }
+            try
+            {
+                string str = recommends["illusts"].ToString();
+                nexturl = recommends["next_url"].GetString();
+                JArray arr = JArray.Parse(recommends["illusts"].ToString());
+                foreach (JToken ill in arr)
+                {
+                    if (ill["meta_single_page"]["original_image_url"] != null)
+                    {
+                        ImageInfo imginfo = new ImageInfo();
+                        imginfo.imgUrl = ill["meta_single_page"]["original_image_url"].ToString();
+                        imginfo.viewCount = (int)ill["total_view"];
+                        imginfo.isR18 = false;
+                        imginfo.userId = ill["user"]["id"].ToString();
+                        imginfo.userName = ill["user"]["account"].ToString();
+                        imginfo.imgId = ill["id"].ToString();
+                        imginfo.imgName = ill["title"].ToString();
+                        imginfo.height = (int)ill["height"];
+                        imginfo.width = (int)ill["width"];
 
-                queue.Enqueue(imginfo);
+                        queue.Enqueue(imginfo);                        
+                    }  
+                }
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e.Message);
             }
             return queue;
         }
@@ -240,5 +269,26 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return path;
         }
 
+        public async Task downloadImgV2(ImageInfo img)
+        {
+            try
+            {
+                using (Stream resStream = await (await new PixivAppAPI(baseAPI).RequestCall("GET",
+                      img.imgUrl, new Dictionary<string, string>() { { "Referer", "https://app-api.pixiv.net/" } })).
+                      Content.ReadAsStreamAsync())
+                {
+                    StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(img.imgId, CreationCollisionOption.OpenIfExists);
+                    using (Stream write = await file.OpenStreamForWriteAsync())
+                    {
+                        resStream.Position = 0;
+                        await resStream.CopyToAsync(write);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+        }
     }
 }

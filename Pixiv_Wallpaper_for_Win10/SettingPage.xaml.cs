@@ -16,6 +16,7 @@ using Windows.Storage;
 using Pixiv_Wallpaper_for_Win10.Util;
 using System.Collections.ObjectModel;
 using Windows.System;
+using System.Threading.Tasks;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -61,7 +62,7 @@ namespace Pixiv_Wallpaper_for_Win10
                     break;
             }
 
-            if(c.cookie!=null)
+            if(c.cookie!=null&&!"".Equals(c.cookie))
             {
                 loginV1.Content = "已登录";
             }
@@ -79,21 +80,12 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 case "Top_50":
                     radiobutton1.IsChecked = true;
-                    textbox1.IsEnabled = false;
-                    passwordbox1.IsEnabled = false;
-                    loginV1.IsEnabled = false;
                     break;
                 case "You_Like_V1":
                     radiobutton2.IsChecked = true;
-                    textbox1.IsEnabled = false;
-                    passwordbox1.IsEnabled = false;
-                    loginV1.IsEnabled = true;
                     break;
                 case "You_Like_V2":
                     radiobutton3.IsChecked = true;
-                    loginV1.IsEnabled = false;
-                    textbox1.IsEnabled = true;
-                    passwordbox1.IsEnabled = true;
                     break;
                 default:
                     radiobutton1.IsChecked = true;
@@ -179,58 +171,32 @@ namespace Pixiv_Wallpaper_for_Win10
 
         private async void loginV1_Click(object sender, RoutedEventArgs e)
         {
-            WebViewLogin wvl = new WebViewLogin(900, 600);
-            wvl.targetUri = "https://www.pixiv.net/";
-            wvl.loginUri = "https://accounts.pixiv.net/login";
+            WebViewLogin wvl = new WebViewLogin("https://accounts.pixiv.net/login", "https://www.pixiv.net/");
             wvl.ClearCookies();
             wvl.Method += SetCookie;
-            await wvl.ShowWebView();
+            await wvl.ShowWebView(1000, 800);
         }
 
-        private void radiobutton1_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void radiobutton2_Checked(object sender, RoutedEventArgs e)
         {
-            if(radiobutton1.IsChecked==true)
-            {
-                if (textbox1.Text == null)
-                {
-                    textbox1.Text = "";
-                }
-                if (passwordbox1.Password == null)
-                {
-                    passwordbox1.Password = "";
-                }
-                textbox1.IsEnabled = false;
-                passwordbox1.IsEnabled = false;
-                loginV1.IsEnabled = false;
-            }
+            loginV1.IsEnabled = true;
         }
 
-        private void radiobutton2_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void radiobutton3_Checked(object sender, RoutedEventArgs e)
         {
-            if(radiobutton2.IsChecked==true)
-            {
-                if (textbox1.Text == null)
-                {
-                    textbox1.Text = "";
-                }
-                if (passwordbox1.Password == null)
-                {
-                    passwordbox1.Password = "";
-                }
-                textbox1.IsEnabled = false;
-                passwordbox1.IsEnabled = false;
-                loginV1.IsEnabled = true;
-            }   
+            textbox1.IsEnabled = true;
+            passwordbox1.IsEnabled = true;
         }
 
-        private void radiobutton3_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void radiobutton2_Unchecked(object sender, RoutedEventArgs e)
         {
-            if(radiobutton3.IsChecked==true)
-            {
-                textbox1.IsEnabled = true;
-                passwordbox1.IsEnabled = true;
-                loginV1.IsEnabled = false;
-            }            
+            loginV1.IsEnabled = false;
+        }
+
+        private void radiobutton3_Unchecked(object sender, RoutedEventArgs e)
+        {
+            textbox1.IsEnabled = false;
+            passwordbox1.IsEnabled = false;
         }
     }
 }

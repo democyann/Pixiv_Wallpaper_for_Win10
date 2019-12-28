@@ -17,21 +17,21 @@
                 </ComboBox>
                 <TextBlock Text="推荐模式" Margin="30,0,0,0" FontSize="20" RequestedTheme="Dark"/>
                 <TextBlock Text="[猜你喜欢]模式将自动筛选长宽比" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
-                <RadioButton x:Name="radiobutton1" GroupName="mode" Margin="30,0,0,0" Content="每日Top50" IsChecked="True" RequestedTheme="Dark" IsEnabledChanged="radiobutton1_IsEnabledChanged"/>
-                <RadioButton x:Name="radiobutton2" GroupName="mode" Margin="30,0,0,0" Content="猜你喜欢V1(WebView登录)" RequestedTheme="Dark" IsEnabledChanged="radiobutton2_IsEnabledChanged"/>
-                <RadioButton x:Name="radiobutton3" GroupName="mode" Margin="30,0,0,0" Content="猜你喜欢V2(PixivCSAPI登录)" RequestedTheme="Dark" IsEnabledChanged="radiobutton3_IsEnabledChanged"/>
+                <RadioButton x:Name="radiobutton1" GroupName="mode" Margin="30,0,0,0" Content="每日Top50" IsChecked="True" RequestedTheme="Dark"/>
+                <RadioButton x:Name="radiobutton2" GroupName="mode" Margin="30,0,0,0" Content="猜你喜欢V1(WebView登录)" RequestedTheme="Dark" Checked="radiobutton2_Checked" Unchecked="radiobutton2_Unchecked"/>
+                <RadioButton x:Name="radiobutton3" GroupName="mode" Margin="30,0,0,0" Content="猜你喜欢V2(PixivCSAPI登录)" RequestedTheme="Dark" Checked="radiobutton3_Checked" Unchecked="radiobutton3_Unchecked"/>
                 <TextBlock Text="Pixiv登录V1" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
                 <TextBlock Text="点击按钮进入Pixiv登录页" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
-                <Button x:Name="loginV1" Margin="30,10,0,0" Click="loginV1_Click" RequestedTheme="Dark"/>
+                <Button x:Name="loginV1" Margin="30,10,0,0" Click="loginV1_Click" RequestedTheme="Dark" IsEnabled="false"/>
                 <TextBlock Text="Pixiv登录V2" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
                 <TextBlock Text="账号密码将自动存储在配置文件中" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
                 <StackPanel x:Name="sp2" Orientation="Horizontal">
                     <TextBlock Text="账号:" Margin="30,10,0,0" FontSize="15" RequestedTheme="Dark"/>
-                    <TextBox x:Name="textbox1" Margin="10,10,0,0"  Width="200" RequestedTheme="Dark"/>
+                    <TextBox x:Name="textbox1" Margin="10,10,0,0"  Width="200" RequestedTheme="Dark" IsEnabled="False"/>
                 </StackPanel>
                 <StackPanel x:Name="sp3" Orientation="Horizontal">
                     <TextBlock Text="密码:" Margin="30,10,0,0" FontSize="15" RequestedTheme="Dark"/>
-                    <PasswordBox x:Name="passwordbox1" Margin="10,10,0,0" Width="200"  RequestedTheme="Dark"/>
+                    <PasswordBox x:Name="passwordbox1" Margin="10,10,0,0" Width="200"  RequestedTheme="Dark" IsEnabled="False"/>
                 </StackPanel>
                 <TextBlock Text="缓存数据" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
                 <TextBlock Text="此项操作可能需要管理员权限" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>

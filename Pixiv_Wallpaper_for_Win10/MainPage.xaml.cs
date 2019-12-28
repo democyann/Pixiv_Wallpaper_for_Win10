@@ -48,6 +48,7 @@ namespace Pixiv_Wallpaper_for_Win10
             top50 = new PixivTop50();
             like = new PixivLike();
             c = new Conf();
+            img = c.lastImg;
             session = null;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMinutes(c.time);
@@ -106,7 +107,7 @@ namespace Pixiv_Wallpaper_for_Win10
                     await Task.Run(async () => { img = await like.SelectArtWorkV1(); });
                     break;
                 case "You_Like_V2":
-                    await Task.Run(async () => { img = await like.SelectArtWorkV2(); });
+                    img = await like.SelectArtWorkV2();//该API无法在子线程中调用
                     break;
                 default:
                     await Task.Run(async () => { img = await top50.SelectArtWork(); });
@@ -141,7 +142,7 @@ namespace Pixiv_Wallpaper_for_Win10
                 {
                     file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId));
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     timer.Interval = TimeSpan.FromSeconds(2);
                     timer.Start();

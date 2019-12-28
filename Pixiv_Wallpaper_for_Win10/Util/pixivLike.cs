@@ -100,7 +100,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     likeV2.TryDequeue(out img);
                     if (img != null && img.WHratio >= 1.33 && !img.isR18)
                     {
-                        await pixiv.downloadImg(img);
+                        await pixiv.downloadImgV2(img);
                         break;
                     }
                 }
