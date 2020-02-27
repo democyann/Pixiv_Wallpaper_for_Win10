@@ -277,10 +277,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                       Content.ReadAsStreamAsync())
                 {
                     StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(img.imgId, CreationCollisionOption.OpenIfExists);
-                    using (Stream write = await file.OpenStreamForWriteAsync())
+                    using (Stream writer = await file.OpenStreamForWriteAsync())
                     {
-                        resStream.Position = 0;
-                        await resStream.CopyToAsync(write);
+                        await resStream.CopyToAsync(writer);
                     }
                 }
             }

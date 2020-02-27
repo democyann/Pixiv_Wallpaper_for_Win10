@@ -27,7 +27,6 @@ namespace Pixiv_Wallpaper_for_Win10
     /// </summary>
     public sealed partial class SettingPage : Page
     {
-        ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;  //获取本地应用设置容器(单例)
         StorageFolder folder = ApplicationData.Current.LocalFolder;
         Conf c = new Conf();
 
@@ -46,20 +45,15 @@ namespace Pixiv_Wallpaper_for_Win10
 
             combox1.SelectedValue = c.time;
 
-            switch (c.proxy)
+            if(c.proxy)
             {
-                case "enable":
-                    radiobutton4.IsChecked = true;
-                    textbox3.IsEnabled = true;
-                    break;
-                case "disable":
-                    radiobutton5.IsChecked = true;
-                    textbox3.IsEnabled = false;
-                    break;
-                default:
-                    radiobutton5.IsChecked = true;
-                    textbox3.IsEnabled = false;
-                    break;
+                proxy_check.IsChecked = true;
+                //textbox3.IsEnabled = true;
+            }
+            else
+            {
+                proxy_check.IsChecked = false; 
+                //textbox3.IsEnabled = false;
             }
 
             if(c.cookie!=null&&!"".Equals(c.cookie))
@@ -71,7 +65,7 @@ namespace Pixiv_Wallpaper_for_Win10
                 loginV1.Content = "请登录";
             }
 
-            lock_che.IsChecked = c.lockscr;
+            lock_switch.IsOn = c.lockscr;
             textbox1.Text = c.account;
             passwordbox1.Password = c.password;
             textbox3.Text = c.proxy_port;
@@ -97,36 +91,41 @@ namespace Pixiv_Wallpaper_for_Win10
         {
             if (radiobutton2.IsChecked == true)
             {
-                localSettings.Values["Mode"] = "You_Like_V1";        //设置本地保存文件（模式）为猜你喜欢(Webview)
+                c.mode = "You_Like_V1";        //设置本地保存文件（模式）为猜你喜欢(Webview)
             }
             if (radiobutton1.IsChecked == true)
             {
-                localSettings.Values["Mode"] = "Top_50";         //设置本地保存文件（模式）为TOP50
+                c.mode = "Top_50";         //设置本地保存文件（模式）为TOP50
             }
-            if(radiobutton3.IsChecked==true)
+            if(radiobutton3.IsChecked == true)
             {
-                localSettings.Values["Mode"] = "You_Like_V2";   //设置本地保存文件 (模式) 为猜你喜欢(PixivCS)
+                c.mode = "You_Like_V2";   //设置本地保存文件 (模式) 为猜你喜欢(PixivCS)
             }
-            if(radiobutton4.IsChecked==true)
+            if(proxy_check.IsChecked == true)
             {
-                localSettings.Values["proxy"] = "enable";
                 if (textbox3.Text != null)
                 {
-                    localSettings.Values["proxy_port"] = textbox3.Text;
+                    c.proxy_port = textbox3.Text;
+                    c.proxy = true;
                 }
                 else
                 {
-                    radiobutton5.IsChecked = true;
+                    proxy_check.IsChecked = false;
+                    c.proxy = false;
                 }                   
             }
-            if (radiobutton5.IsChecked == true)
+            else
             {
-                localSettings.Values["proxy"] = "disable";
+                c.proxy = false;
+                if (textbox3.Text != null)
+                {
+                    c.proxy_port = textbox3.Text;
+                }
             }
-            localSettings.Values["Lock"] = lock_che.IsChecked;
-            localSettings.Values["Account"] = textbox1.Text;     //保存账号
-            localSettings.Values["Password"] = passwordbox1.Password;    //保存密码
-            localSettings.Values["Time"] = combox1.SelectedValue;    //保存时间
+            c.lockscr = lock_switch.IsOn;
+            c.account = textbox1.Text;     //保存账号
+            c.password = passwordbox1.Password;    //保存密码
+            c.time = (int)combox1.SelectedValue;    //保存时间
         }
 
         private void SetCookie(string str)
@@ -150,16 +149,6 @@ namespace Pixiv_Wallpaper_for_Win10
                     await f.DeleteAsync();
                 }     
             }
-        }
-
-        private void Radiobutton4_Checked(object sender, RoutedEventArgs e)
-        {
-            textbox3.IsEnabled = true;
-        }
-
-        private void Radiobutton5_Checked(object sender, RoutedEventArgs e)
-        {
-            textbox3.IsEnabled = false;
         }
 
         private void cleanToken_Click(object sender, RoutedEventArgs e)
@@ -197,6 +186,16 @@ namespace Pixiv_Wallpaper_for_Win10
         {
             textbox1.IsEnabled = false;
             passwordbox1.IsEnabled = false;
+        }
+
+        private void proxy_check_Checked(object sender, RoutedEventArgs e)
+        {
+            textbox3.IsEnabled = true;
+        }
+
+        private void proxy_check_Unchecked(object sender, RoutedEventArgs e)
+        {
+            textbox3.IsEnabled = false;
         }
     }
 }

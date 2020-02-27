@@ -23,7 +23,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         {
             get
             {
-                if (localSettings.Values["Account"]!=null)
+                if (localSettings.Values["Account"] != null)
                 {
                     return localSettings.Values["Account"].ToString();
                 }
@@ -31,6 +31,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     return "";
                 }
+            }
+            set
+            {
+                localSettings.Values["Account"] = value;
             }
         }
 
@@ -50,6 +54,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     return "";
                 }
             }
+            set
+            {
+                localSettings.Values["Password"] = value;
+            }
         }
 
         /// <summary>
@@ -67,6 +75,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     return localSettings.Values["Mode"].ToString();
                 }
+            }
+            set
+            {
+                localSettings.Values["Mode"] = value;
             }
         }
 
@@ -86,6 +98,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     return Convert.ToInt32(localSettings.Values["Time"]);
                 }
             }
+            set
+            {
+                localSettings.Values["Time"] = value;
+            }
         }
         /// <summary>
         /// 是否更改锁屏
@@ -102,6 +118,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     return Convert.ToBoolean(localSettings.Values["Lock"]);
                 }
+            }
+            set
+            {
+                localSettings.Values["Lock"] = value;
             }
         }
 
@@ -175,22 +195,22 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <summary>
         /// HTTP代理开关
         /// </summary>
-        public string proxy
+        public bool proxy
         {
             get
             {
-                if(localSettings.Values["proxy"] == null)
+                if (localSettings.Values["proxy"] == null)
                 {
-                    return "disable";
+                    return false;
                 }
                 else
                 {
-                    return localSettings.Values["proxy"].ToString();
+                    return Convert.ToBoolean(localSettings.Values["proxy"]);
                 }
             }
             set
             {
-                localSettings.Values["proxy"] = JsonConvert.SerializeObject(value);
+                localSettings.Values["proxy"] = value;
             }
         }
 
@@ -210,7 +230,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             set
             {
-                localSettings.Values["proxy_port"] = JsonConvert.SerializeObject(value);
+                localSettings.Values["proxy_port"] = value;
             }
         }
     }

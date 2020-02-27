@@ -45,8 +45,6 @@ namespace Pixiv_Wallpaper_for_Win10
         {
             this.InitializeComponent();
             mp = this;
-            top50 = new PixivTop50();
-            like = new PixivLike();
             c = new Conf();
             img = c.lastImg;
             session = null;
@@ -57,29 +55,13 @@ namespace Pixiv_Wallpaper_for_Win10
 
             BeginExtendedExecution(); //申请后台常驻
 
-            if(c.proxy=="enable")
+            if(c.proxy == true)
             {
                 HttpUtil.proxyPort = c.proxy_port;
             }
             else
             {
                 HttpUtil.proxyPort = null;
-            }
-
-            if (c.lastImg != null) { 
-                ImageBrush br = new ImageBrush();
-                br.Stretch = Stretch.UniformToFill;
-                br.AlignmentX = AlignmentX.Left;
-                br.AlignmentY = AlignmentY.Top;
-                br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.imgId));
-            }
-            else
-            {
-                ImageBrush br = new ImageBrush();
-                br.Stretch = Stretch.UniformToFill;
-                br.AlignmentX = AlignmentX.Left;
-                br.AlignmentY = AlignmentY.Top;
-                br.ImageSource = new BitmapImage(new Uri("ms-appx:///Res/62258773_p0.png"));
             }
 
             main.Navigate(typeof(ShowPage));
@@ -101,15 +83,31 @@ namespace Pixiv_Wallpaper_for_Win10
             switch (c.mode)
             {
                 case "Top_50":
+                    if(top50 == null)
+                    {
+                        top50 = new PixivTop50();
+                    }
                     await Task.Run(async () => { img = await top50.SelectArtWork(); });         
                     break;
                 case "You_Like_V1":
+                    if(like == null)
+                    {
+                        like = new PixivLike();
+                    }
                     await Task.Run(async () => { img = await like.SelectArtWorkV1(); });
                     break;
                 case "You_Like_V2":
-                    img = await like.SelectArtWorkV2();//该API无法在子线程中调用
+                    if (like == null)
+                    {
+                        like = new PixivLike();
+                    }
+                    img = await like.SelectArtWorkV2(); //该API在UI线程被建立，不支持从子线程调用
                     break;
                 default:
+                    if (top50 == null)
+                    {
+                        top50 = new PixivTop50();
+                    }
                     await Task.Run(async () => { img = await top50.SelectArtWork(); });
                     break;
             }

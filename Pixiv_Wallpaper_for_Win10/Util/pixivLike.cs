@@ -22,7 +22,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         public async Task ListUpdateV1(bool flag = false)
         {
             if(like==null||like.Count==0||flag)
-            {
+            { 
                 like = await pixiv.getRecommlistV1(); 
             }
         }

@@ -11,8 +11,8 @@
         <Grid.Background>
             <AcrylicBrush x:Name="CMapUwpAcrylicBrush"
               BackgroundSource="HostBackdrop"
-              TintColor="#FFFFFBFB"
-              TintOpacity="0.1"
+              TintColor="#FFC3BEBE"
+              TintOpacity="0.3"
               FallbackColor="{StaticResource SystemAccentColor}"/>
         </Grid.Background>
         <Image x:Name="show_img"></Image>

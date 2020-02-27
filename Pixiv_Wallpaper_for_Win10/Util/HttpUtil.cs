@@ -136,7 +136,14 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     //UI code here
                     MessageDialog dialog = new MessageDialog("");
-                    dialog.Content=e.Message.ToString();
+                    if ("The remote server returned an error: (403) .".Equals(e.Message))
+                    {
+                        dialog.Content = "请确认是否已登录或尝试清除Cookie与token后再次登录";
+                    }
+                    else
+                    {
+                        dialog.Content = e.Message.ToString();
+                    }  
                     await dialog.ShowAsync();
                 });
                 return "ERROR";
@@ -214,51 +221,41 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <param name="userid">图片作者ID</param>
         /// <param name="imgid">图片ID</param>
         /// <returns>图片存储地址</returns>
-        public async Task<string> ImageDownloadAsync(string imgid)
+        public async Task ImageDownloadAsync(string imgid)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = "GET";
-            request.Accept = contype[(int)dataType];
-            request.Headers["Cookie"] = cookie;
-            request.Headers["Referer"] = referer;
             if (proxyPort != null)
             {
                 int port = int.Parse(proxyPort);
                 WebProxy proxyObject = new WebProxy("127.0.0.1", port);
                 request.Proxy = proxyObject;
             }
+            request.Method = "GET";
+            request.Accept = contype[(int)dataType];
+            request.Headers["Cookie"] = cookie;
+            request.Headers["Referer"] = referer;
 
-            HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-
-            if (response.StatusCode == HttpStatusCode.OK)
+            try
             {
-                Stream s = response.GetResponseStream();
-                StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(imgid, CreationCollisionOption.OpenIfExists);
-                Stream write = await file.OpenStreamForWriteAsync();
-                int l;
-                long a = 0;
-                do
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    byte[] temp = new byte[1024];
-                    l = s.Read(temp, 0, 1024);
-                    if (l > 0)
+                    using (Stream res = response.GetResponseStream())
                     {
-                        await write.WriteAsync(temp, 0, l);
+                        
+                        StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(imgid, CreationCollisionOption.OpenIfExists);
+                        using (Stream writer = await file.OpenStreamForWriteAsync())
+                        {
+                            await res.CopyToAsync(writer);
+                        }
                     }
-                    a += l;
-
-                } while (l > 0);
-                write.Dispose();
-                s.Dispose();
+                }
             }
-            else
+            catch(Exception e)
             {
-                return "ERROR";
+                Debug.WriteLine(e.Message);
             }
-
-            response.Dispose();
-
-            return imgid;
 
         }
     }
