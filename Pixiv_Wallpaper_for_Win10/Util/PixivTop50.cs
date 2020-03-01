@@ -51,7 +51,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     break;
                 }
 
-                await p.downloadImg(img);
+                if(!await p.downloadImg(img))
+                {
+                    img = null;
+                }
 
             }
             return img;

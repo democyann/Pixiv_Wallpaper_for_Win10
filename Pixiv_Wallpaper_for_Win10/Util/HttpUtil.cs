@@ -216,12 +216,12 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             
         }
         /// <summary>
-        /// 图片下载方法
+        /// 插画下载方法
         /// </summary>
-        /// <param name="userid">图片作者ID</param>
-        /// <param name="imgid">图片ID</param>
-        /// <returns>图片存储地址</returns>
-        public async Task ImageDownloadAsync(string imgid)
+        /// <param name="userid">插画作者ID</param>
+        /// <param name="imgid">插画ID</param>
+        /// <returns>插画存储地址</returns>
+        public async Task<string> ImageDownloadAsync(string imgid)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             if (proxyPort != null)
@@ -248,13 +248,34 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                         using (Stream writer = await file.OpenStreamForWriteAsync())
                         {
                             await res.CopyToAsync(writer);
+                            return imgid;
                         }
                     }
                 }
+                else
+                {
+                    //使UI线程调用lambda表达式内的方法
+                    await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                    {
+                        //UI code here
+                        MessageDialog dialog = new MessageDialog("");
+                        dialog.Content = "获取插画时连接失败";
+                        await dialog.ShowAsync();
+                    });
+                    return "ERROR";
+                }
             }
-            catch(Exception e)
+            catch(Exception)
             {
-                Debug.WriteLine(e.Message);
+                //使UI线程调用lambda表达式内的方法
+                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("");
+                    dialog.Content = "获取插画时连接超时或中断";
+                    await dialog.ShowAsync();
+                });
+                return "ERROR";
             }
 
         }

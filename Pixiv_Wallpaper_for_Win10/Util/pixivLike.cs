@@ -18,7 +18,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         private Pixiv pixiv = new Pixiv();
         private Conf c = new Conf();
 
-
+        /// <summary>
+        /// 列表更新1
+        /// </summary>
+        /// <param name="flag">是否强制更新</param>
+        /// <returns></returns>
         public async Task ListUpdateV1(bool flag = false)
         {
             if(like==null||like.Count==0||flag)
@@ -67,7 +71,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     }
                     if (img!=null&&img.WHratio>=1.33&&!img.isR18)
                     {
-                        await pixiv.downloadImg(img);
+                        if(!await pixiv.downloadImg(img))         //当获取插画失败时返回null
+                        {
+                            img = null;
+                        }
                         break;
                     }
                 }
@@ -100,7 +107,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     likeV2.TryDequeue(out img);
                     if (img != null && img.WHratio >= 1.33 && !img.isR18)
                     {
-                        await pixiv.downloadImgV2(img);
+                        if(!await pixiv.downloadImgV2(img))              //当获取插画失败时返回null
+                        {
+                            img = null;
+                        }
                         break;
                     }
                 }
@@ -118,6 +128,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             return img;
         }
 
+        /// <summary>
+        /// 列表更新方式2
+        /// </summary>
+        /// <param name="flag">是否强制更新</param>
+        /// <returns></returns>
         public async Task ListUpdateV2(bool flag = false)
         {
             if(flag || likeV2.Count==0 || like == null)

@@ -116,11 +116,12 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 c.lastImg = img;
                 main.Navigate(typeof(ShowPage));//图片展示页面更新
-
                 timer.Interval = TimeSpan.FromMinutes(c.time);
                 timer.Start();
+                return true;
             }
-            return true;
+            else
+                return false;
         }
 
         private async void SetWallpaper(bool done)
@@ -163,14 +164,6 @@ namespace Pixiv_Wallpaper_for_Win10
                 {
                     dialog.Content = "更换壁纸操作失败。";
                     await dialog.ShowAsync();
-                }
-                ImageBrush br = new ImageBrush();
-                br.Stretch = Stretch.UniformToFill;
-                br.AlignmentX = AlignmentX.Left;
-                br.AlignmentY = AlignmentY.Top;
-                if(img.imgId!=null)
-                {
-                    br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
                 }
             }
         }
@@ -268,7 +261,7 @@ namespace Pixiv_Wallpaper_for_Win10
                     await Task.Run(async () => { await like.ListUpdateV1(true); });
                     break;
                 case "You_Like_V2":
-                    await Task.Run(async () => { await like.ListUpdateV2(true); });
+                    await like.ListUpdateV2(true);
                     break;
                 default:
                     await Task.Run(async () => { await top50.listUpdate(true); });

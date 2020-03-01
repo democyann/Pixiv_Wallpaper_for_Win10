@@ -102,7 +102,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <summary>
         /// 获取"猜你喜欢"推荐列表(Web模拟)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>插画id队列</returns>
 
         public async Task<ConcurrentQueue<string>> getRecommlistV1()
         {
@@ -132,7 +132,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// </summary>
         /// <param name="account"></param>
         /// <param name="password"></param>
-        /// <returns></returns>
+        /// <returns>插画信息队列</returns>
         public async Task<ConcurrentQueue<ImageInfo>> getRecommenlistV2(string account = null, string password = null)
         {
             ConcurrentQueue<ImageInfo> queue = new ConcurrentQueue<ImageInfo>();
@@ -203,7 +203,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         }
 
         /// <summary>
-        /// 图片信息查询子方法1
+        /// 插画信息查询子方法1
         /// </summary>
         /// <param name="imgid">要查找的作品ID</param>
         /// <returns></returns>
@@ -216,7 +216,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
        
 
         /// <summary>
-        /// 查询图片信息
+        /// 查询插画信息
         /// </summary>
         /// <param name="id">要查找的作品ID</param>
         /// <returns></returns>
@@ -253,11 +253,11 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         }
 
         /// <summary>
-        /// 图片下载
+        /// 插画下载
         /// </summary>
-        /// <param name="img">要下载的图片信息</param>
-        /// <returns></returns>
-        public async Task downloadImg(ImageInfo img)
+        /// <param name="img">要下载的插画信息</param>
+        /// <returns>是否成功下载插画</returns>
+        public async Task<bool> downloadImg(ImageInfo img)
         {
             Regex reg = new Regex("/c/[0-9]+x[0-9]+/img-master");
             img.imgUrl = reg.Replace(img.imgUrl, "/img-master", 1);
@@ -265,10 +265,19 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             HttpUtil download = new HttpUtil(img.imgUrl, HttpUtil.Contype.IMG);
             download.referer = "https://www.pixiv.net/artworks/" + img.imgId;
             download.cookie = cookie;
-            await download.ImageDownloadAsync(img.imgId);
+            string check = await download.ImageDownloadAsync(img.imgId);
+            if (!"ERROR".Equals(check))
+                return true;
+            else
+                return false;
         }
 
-        public async Task downloadImgV2(ImageInfo img)
+        /// <summary>
+        /// 使用PixivCS API进行插画下载
+        /// </summary>
+        /// <param name="img"></param>
+        /// <returns>是否成功下载插画</returns>
+        public async Task<bool> downloadImgV2(ImageInfo img)
         {
             try
             {
@@ -280,12 +289,21 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     using (Stream writer = await file.OpenStreamForWriteAsync())
                     {
                         await resStream.CopyToAsync(writer);
+                        return true;
                     }
                 }
             }
             catch(Exception e)
             {
-                Debug.WriteLine(e.Message);
+                //使UI线程调用lambda表达式内的方法
+                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("");
+                    dialog.Content = "获取插画时发生未知错误";
+                    await dialog.ShowAsync();
+                });
+                return false;
             }
         }
     }
