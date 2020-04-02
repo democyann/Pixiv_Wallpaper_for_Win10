@@ -106,17 +106,17 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <summary>
         /// 是否更改锁屏
         /// </summary>
-        public int lockscr
+        public bool lockscr
         {
             get
             {
                 if (localSettings.Values["Lock"] == null)
                 {
-                    return 0;
+                    return false;
                 }
                 else
                 {
-                    return Convert.ToInt32(localSettings.Values["Lock"]);
+                    return Convert.ToBoolean(localSettings.Values["Lock"]);
                 }
             }
             set
