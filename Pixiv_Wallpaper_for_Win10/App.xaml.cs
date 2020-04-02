@@ -9,6 +9,7 @@ using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using Windows.UI.Notifications;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -101,6 +102,37 @@ namespace Pixiv_Wallpaper_for_Win10
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: 保存应用程序状态并停止任何后台活动
+            deferral.Complete();
+        }
+
+        protected override async void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            var deferral = args.TaskInstance.GetDeferral();
+            //由ToastTrigger触发的后台活动
+            if(args.TaskInstance.Task.Name.Equals("ToastBackgroundTrigger"))
+            {
+                var details = args.TaskInstance.TriggerDetails as ToastNotificationActionTriggerDetail;
+                if (details != null)
+                {
+                    string argument = details.Argument;
+
+                    // Perform tasks
+                    switch(argument)
+                    {
+                        case "action&NextIllust":
+                            MainPage.mp.SetWallpaper(await MainPage.mp.update());
+                            break;
+                        case "action&BatterySetting":
+                            await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:batterysaver"));
+                            break;
+                    }
+                }
+            }
+            //由TimeTrigger触发的后台活动
+            else if(args.TaskInstance.Task.Name.Equals("TimeBackgroundTrigger"))
+            {
+                MainPage.mp.SetWallpaper(await MainPage.mp.update());
+            }
             deferral.Complete();
         }
     }

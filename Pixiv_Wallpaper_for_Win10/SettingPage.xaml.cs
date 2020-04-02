@@ -35,7 +35,7 @@ namespace Pixiv_Wallpaper_for_Win10
             this.InitializeComponent();
             
             //下拉框初始化
-            combox1.Items.Add(new KeyValuePair<string, int>("10 分钟", 10));
+            combox1.Items.Add(new KeyValuePair<string, int>("15 分钟", 15));
             combox1.Items.Add(new KeyValuePair<string, int>("30 分钟", 30));
             combox1.Items.Add(new KeyValuePair<string, int>("60 分钟", 60));
             combox1.Items.Add(new KeyValuePair<string, int>("120 分钟", 120));
