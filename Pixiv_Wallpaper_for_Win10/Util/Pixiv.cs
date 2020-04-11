@@ -59,8 +59,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             }
             else
             {
-                MessageDialog dialog = new MessageDialog("update rall list Error");
-                await dialog.ShowAsync();
+                string title = "获取插画队列时发生错误";
+                string content = " ";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
             }
             return queue;
         }
@@ -86,16 +88,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     f = true;
                 }
             }
-            else
-            {
-                //使UI线程调用lambda表达式内的方法
-                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
-                {
-                    //UI code here
-                    MessageDialog dialog = new MessageDialog("get token failure");
-                    await dialog.ShowAsync();
-                });
-            }
             return f;
         }
 
@@ -110,7 +102,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             ConcurrentQueue<string> queue = new ConcurrentQueue<string>();
             HttpUtil recomm = new HttpUtil(RECOMM_URL + token, HttpUtil.Contype.JSON);
             recomm.cookie = cookie;
-            recomm.referer = "https://www.pixiv.net/discovery";
+            recomm.referrer = "https://www.pixiv.net/discovery";
 
             like = await recomm.GetDataAsync();
 
@@ -263,7 +255,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             img.imgUrl = reg.Replace(img.imgUrl, "/img-master", 1);
 
             HttpUtil download = new HttpUtil(img.imgUrl, HttpUtil.Contype.IMG);
-            download.referer = "https://www.pixiv.net/artworks/" + img.imgId;
+            download.referrer = "https://www.pixiv.net/artworks/" + img.imgId;
             download.cookie = cookie;
             string check = await download.ImageDownloadAsync(img.imgId);
             if (!"ERROR".Equals(check))
@@ -293,16 +285,20 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     }
                 }
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 //使UI线程调用lambda表达式内的方法
-                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                /*await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                 {
                     //UI code here
                     MessageDialog dialog = new MessageDialog("");
                     dialog.Content = "获取插画时发生未知错误";
                     await dialog.ShowAsync();
-                });
+                });*/
+                string title = "下载插画时发生未知错误";
+                string content = " ";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
                 return false;
             }
         }

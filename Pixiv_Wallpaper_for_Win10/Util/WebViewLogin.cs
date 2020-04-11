@@ -33,7 +33,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             this.targetUri = targetUri;
         }
 
-        public async Task ShowWebView(int width,int height)
+        public async System.Threading.Tasks.Task ShowWebView(int width,int height)
         {
             appWindow = await AppWindow.TryCreateAsync();
             webView.Width = width;

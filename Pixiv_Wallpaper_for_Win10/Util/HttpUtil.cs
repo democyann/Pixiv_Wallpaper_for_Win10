@@ -57,7 +57,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <summary>
         /// 获取或设置原引用地址
         /// </summary>
-        public string referer { get; set; }
+        public string referrer { get; set; }
 
         /// <summary>
         /// 获取或设置认证网址
@@ -97,9 +97,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             {
                 request.Headers["Authority"] = authority;
             }           
-            if (referer != null)
+            if (referrer != null)
             {
-                request.Headers["Referer"] = referer;
+                request.Headers["Referer"] = referrer;
             }
             if(proxyPort!=null)
             {
@@ -164,9 +164,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Headers["Accept-Encoding"] = "gzip,deflate,sdch";
             request.UserAgent = USER_AGENT;
             request.ContentType = "application/x-www-form-urlencoded";
-            if (referer != null)
+            if (referrer != null)
             {
-                request.Headers["Referer"] = referer;
+                request.Headers["Referer"] = referrer;
             }
             if (proxyPort != null)
             {
@@ -223,7 +223,8 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <returns>插画存储地址</returns>
         public async Task<string> ImageDownloadAsync(string imgid)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            //应访问一次插画展示页使pixiv记录一次浏览数以尊重他人成果
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(referrer);
             if (proxyPort != null)
             {
                 int port = int.Parse(proxyPort);
@@ -233,48 +234,62 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Method = "GET";
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
-            request.Headers["Referer"] = referer;
+            request.Headers["Referer"] = "https://www.pixiv.net/discovery";
+            await request.GetResponseAsync();
+
+            //正式开始获取插画原图
+            request = (HttpWebRequest)WebRequest.Create(url);
+            if (proxyPort != null)
+            {
+                int port = int.Parse(proxyPort);
+                WebProxy proxyObject = new WebProxy("127.0.0.1", port);
+                request.Proxy = proxyObject;
+            }
+            request.Method = "GET";
+            request.Accept = contype[(int)dataType];
+            request.Headers["Cookie"] = cookie;
+            request.Headers["Referer"] = referrer;
 
             try
             {
-                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-
-                if (response.StatusCode == HttpStatusCode.OK)
+                //判断文件夹中是否已存在该插画，若存在则直接返回该插画
+                if(await ApplicationData.Current.LocalFolder.TryGetItemAsync(imgid + ".jpg")!=null)
                 {
-                    using (Stream res = response.GetResponseStream())
-                    {
-                        
-                        StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(imgid, CreationCollisionOption.OpenIfExists);
-                        using (Stream writer = await file.OpenStreamForWriteAsync())
-                        {
-                            await res.CopyToAsync(writer);
-                            return imgid;
-                        }
-                    }
+                    return imgid;
                 }
                 else
                 {
-                    //使UI线程调用lambda表达式内的方法
-                    await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                    HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+
+                    if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        //UI code here
-                        MessageDialog dialog = new MessageDialog("");
-                        dialog.Content = "获取插画时连接失败";
-                        await dialog.ShowAsync();
-                    });
-                    return "ERROR";
+                        using (Stream res = response.GetResponseStream())
+                        {
+
+                            StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(imgid + ".jpg", CreationCollisionOption.ReplaceExisting);
+                            using (Stream writer = await file.OpenStreamForWriteAsync())
+                            {
+                                await res.CopyToAsync(writer);
+                                return imgid;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string title = "获取插画时连接失败";
+                        string content = "尝试从pixiv下载插画时连接超时，请检查网络连接";
+                        ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                        tm.ToastPush(60);
+                        return "ERROR";
+                    }
                 }
-            }
+            }    
             catch(Exception)
             {
-                //使UI线程调用lambda表达式内的方法
-                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
-                {
-                    //UI code here
-                    MessageDialog dialog = new MessageDialog("");
-                    dialog.Content = "获取插画时连接超时或中断";
-                    await dialog.ShowAsync();
-                });
+                string title = "获取插画时连接中断";
+                string content = "在从pixiv服务器下载插画时连接中断，请检查网络连接";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
                 return "ERROR";
             }
 

@@ -10,21 +10,21 @@
 
     <Grid Background="#000F0F0F">
         <ScrollViewer Margin="0,0,0,63">
-            <StackPanel x:Name="sp1" Margin="40,0,0,0" Width="460" HorizontalAlignment="Left">
+            <StackPanel x:Name="sp1" Margin="30,0,0,0" Width="460" HorizontalAlignment="Left">
                 <TextBlock Text="更新时间" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
-                <TextBlock Text="设置更新图片的时间间隔" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
+                <TextBlock Text="设置更新图片的时间间隔" FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark"/>
                 <ComboBox Margin="30,10,0,0" Width="200" x:Name="combox1" DisplayMemberPath="Key" SelectedValuePath="Value" RequestedTheme="Dark">
                 </ComboBox>
-                <TextBlock Text="推荐模式" Margin="30,0,0,0" FontSize="20" RequestedTheme="Dark"/>
-                <TextBlock Text="[猜你喜欢]模式将自动筛选长宽比" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
-                <RadioButton x:Name="radiobutton1" GroupName="mode" Margin="30,0,0,0" Content="每日Top50" IsChecked="True" RequestedTheme="Dark"/>
+                <TextBlock Text="推荐模式" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
+                <TextBlock Text="[猜你喜欢]模式将自动筛选长宽比" FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark"/>
+                <RadioButton x:Name="radiobutton1" GroupName="mode" Margin="30,10,0,0" Content="每日Top50" IsChecked="True" RequestedTheme="Dark"/>
                 <RadioButton x:Name="radiobutton2" GroupName="mode" Margin="30,0,0,0" Content="猜你喜欢V1(WebView登录)" RequestedTheme="Dark" Checked="radiobutton2_Checked" Unchecked="radiobutton2_Unchecked"/>
                 <RadioButton x:Name="radiobutton3" GroupName="mode" Margin="30,0,0,0" Content="猜你喜欢V2(PixivCSAPI登录)" RequestedTheme="Dark" Checked="radiobutton3_Checked" Unchecked="radiobutton3_Unchecked"/>
                 <TextBlock Text="Pixiv登录V1" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
-                <TextBlock Text="点击按钮进入Pixiv登录页" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
+                <TextBlock Text="点击按钮进入Pixiv登录页" FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark"/>
                 <Button x:Name="loginV1" Margin="30,10,0,0" Click="loginV1_Click" RequestedTheme="Dark" IsEnabled="false"/>
                 <TextBlock Text="Pixiv登录V2" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
-                <TextBlock Text="通过PixivCS进行登录，账号密码将自动存储在配置文件中" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
+                <TextBlock Text="通过PixivCS进行登录，账号密码将自动存储在配置文件中" FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark"/>
                 <StackPanel x:Name="sp2" Orientation="Horizontal">
                     <TextBlock Text="账号:" Margin="30,10,0,0" FontSize="15" RequestedTheme="Dark"/>
                     <TextBox x:Name="textbox1" Margin="10,10,0,0"  Width="200" RequestedTheme="Dark" IsEnabled="False"/>
@@ -34,21 +34,26 @@
                     <PasswordBox x:Name="passwordbox1" Margin="10,10,0,0" Width="200"  RequestedTheme="Dark" IsEnabled="False"/>
                 </StackPanel>
                 <TextBlock Text="缓存数据" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
-                <TextBlock Text="处理应用程序产生的缓存数据，需要管理员权限" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
+                <TextBlock Text="处理应用程序产生的缓存数据，需要管理员权限" FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark"/>
                 <StackPanel Orientation="Horizontal">
                     <Button Name="clearPicture" Content="清空图片缓存" Margin="30,10,0,0" RequestedTheme="Dark" Click="clearPicture_Click"/>
                     <Button Name="openFilePath" Content="访问图片文件夹" Margin="30,10,0,0" Click="openFilePath_Click" RequestedTheme="Dark"/>
                     <Button Name="cleanToken" Content="清理token与cookie" Margin="30,10,0,0" Click="cleanToken_Click" RequestedTheme="Dark"/>
                 </StackPanel>
                 <TextBlock Text="HTTP代理" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
-                <TextBlock Text="使用HTTP代理处理应用程序的网络通信此项更改将在下一次启动程序时生效" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark" TextWrapping="WrapWholeWords"/>
+                <TextBlock Text="使用HTTP代理处理应用程序的网络通信此项更改将在下一次启动程序时生效" FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark" TextWrapping="WrapWholeWords"/>
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox Name="proxy_check" Margin="30,0,0,0" RequestedTheme="Dark" Content="开启HTTP代理" Checked="proxy_check_Checked" Unchecked="proxy_check_Unchecked"/>
-                    <TextBlock Text="代理端口" Margin="30,7,0,0" FontSize="15" RequestedTheme="Dark"/>
-                    <TextBox x:Name="textbox3" Margin="10,3,0,0"  Width="70" RequestedTheme="Dark" InputScope="Number"/>
+                    <CheckBox Name="proxyCheck" Margin="30,10,0,0" RequestedTheme="Dark" Content="开启HTTP代理" Checked="proxyCheck_Checked" Unchecked="proxyCheck_Unchecked"/>
+                    <TextBlock Text="代理端口" Margin="30,15,0,0" FontSize="15" RequestedTheme="Dark"/>
+                    <TextBox x:Name="textbox3" Margin="10,10,0,0"  Width="70" RequestedTheme="Dark" InputScope="Number"/>
                 </StackPanel>
-                <TextBlock Text="其他" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
-                <TextBlock Text="更换壁纸同时更换锁屏" FontSize="15" Margin="30,0,0,0" RequestedTheme="Dark"/>
+                <TextBlock Text="后台模式" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
+                <TextBlock Text="拓展执行模式使得应用程序在失去用户焦点后也不会进入休眠；后台任务模式将使应用程序在后台休眠时可被触发器定时唤醒进行30秒的后台活动，超时将使应用程序被关闭" 
+                           FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark" TextWrapping="WrapWholeWords"/>
+                <ComboBox Margin="30,10,0,0" Width="100" x:Name="combox2" DisplayMemberPath="Key" SelectedValuePath="Value" RequestedTheme="Dark">
+                </ComboBox>
+                <TextBlock Text="其他选项" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
+                <TextBlock Text="更换壁纸同时更换锁屏" FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark"/>
                 <ToggleSwitch x:Name="lock_switch" Margin="30,10,0,0" RequestedTheme="Dark"></ToggleSwitch>
                 <Button x:Name="button1" Content="确定"  Click="button1_Click" Margin="30,10,0,0" RequestedTheme="Dark"/>
             </StackPanel>

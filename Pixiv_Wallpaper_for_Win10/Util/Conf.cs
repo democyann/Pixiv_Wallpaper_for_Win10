@@ -217,7 +217,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <summary>
         /// 代理端口
         /// </summary>
-        public string proxy_port
+        public string proxyPort
         {
             get
             {
@@ -231,6 +231,24 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             set
             {
                 localSettings.Values["proxy_port"] = value;
+            }
+        }
+
+        /// <summary>
+        /// 后台模式
+        /// </summary>
+        public string backgroundMode
+        {
+            get
+            {
+                if (localSettings.Values["BackgroundMode"] == null)
+                    return "ExtendedSession";
+                else
+                    return localSettings.Values["BackgroundMode"].ToString();
+            }
+            set
+            {
+                localSettings.Values["BackgroundMode"] = value;
             }
         }
     }

@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Microsoft.QueryStringDotNET;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -105,31 +107,42 @@ namespace Pixiv_Wallpaper_for_Win10
             deferral.Complete();
         }
 
+        protected async override void OnActivated(IActivatedEventArgs e)
+        {
+            Frame frame = Window.Current.Content as Frame;
+            if (e is ToastNotificationActivatedEventArgs)
+            {
+                var toastActivationArgs = e as ToastNotificationActivatedEventArgs;
+                QueryString args = QueryString.Parse(toastActivationArgs.Argument);
+                switch (args["action"])
+                {
+                    case "action&NextIllust":
+                        MainPage.mp.SetWallpaper(await MainPage.mp.update());
+                        if (frame.Content is MainPage)
+                            break;
+                        frame.Navigate(typeof(MainPage));
+                        break;
+                    case "action&BatterySetting":
+                        //唤起Windows电源设置
+                        await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:batterysaver"));
+                        if (frame.Content is MainPage)
+                            break;
+                        frame.Navigate(typeof(MainPage));
+                        break;
+                }
+            }
+            Window.Current.Activate();
+            CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
+            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.ButtonBackgroundColor = Colors.Transparent;
+            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+        }
+
         protected override async void OnBackgroundActivated(BackgroundActivatedEventArgs args)
         {
             var deferral = args.TaskInstance.GetDeferral();
-            //由ToastTrigger触发的后台活动
-            if(args.TaskInstance.Task.Name.Equals("ToastBackgroundTrigger"))
-            {
-                var details = args.TaskInstance.TriggerDetails as ToastNotificationActionTriggerDetail;
-                if (details != null)
-                {
-                    string argument = details.Argument;
-
-                    // Perform tasks
-                    switch(argument)
-                    {
-                        case "action&NextIllust":
-                            MainPage.mp.SetWallpaper(await MainPage.mp.update());
-                            break;
-                        case "action&BatterySetting":
-                            await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:batterysaver"));
-                            break;
-                    }
-                }
-            }
             //由TimeTrigger触发的后台活动
-            else if(args.TaskInstance.Task.Name.Equals("TimeBackgroundTrigger"))
+            if (args.TaskInstance.Task.Name.Equals("TimeBackgroundTrigger"))
             {
                 MainPage.mp.SetWallpaper(await MainPage.mp.update());
             }

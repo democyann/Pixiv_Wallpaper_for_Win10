@@ -49,7 +49,7 @@ namespace Pixiv_Wallpaper_for_Win10
             else
             {
                 img = c.lastImg;
-                file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + c.lastImg.imgId));
+                file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + c.lastImg.imgId + ".jpg"));
                 
                 textBlock1.Text = img.imgName;
                 textBlock2.Text = img.userName;

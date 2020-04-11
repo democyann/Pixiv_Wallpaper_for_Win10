@@ -41,6 +41,7 @@ namespace Pixiv_Wallpaper_for_Win10
         private ExtendedExecutionSession session;
         private PixivTop50 top50;
         private PixivLike like;
+        private string backgroundMode;
 
         public MainPage()
         {
@@ -49,24 +50,39 @@ namespace Pixiv_Wallpaper_for_Win10
             c = new Conf();
             img = c.lastImg;
             session = null;
-            //timer = new DispatcherTimer();
-            //timer.Interval = TimeSpan.FromMinutes(c.time);
-            //timer.Tick += Timer_Tick;
-            //timer.Start();
-            //BeginExtendedExecution(); //申请延迟挂起
+            backgroundMode = c.backgroundMode;
 
             if(c.proxy == true)
             {
-                HttpUtil.proxyPort = c.proxy_port;
+                HttpUtil.proxyPort = c.proxyPort;
             }
             else
             {
                 HttpUtil.proxyPort = null;
             }
+            //后台模式选择
+            if(backgroundMode.Equals("BackgroundTask"))
+            {
+                RegistTask(); //注册后台任务以及时间触发器
+            }
+            else
+            {
+                timer = new DispatcherTimer();
+                timer.Interval = TimeSpan.FromMinutes(c.time);
+                timer.Tick += Timer_Tick;
+                timer.Start();
+                BeginExtendedExecution(); //申请延迟挂起
+
+                foreach (var i in BackgroundTaskRegistration.AllTasks.Values)
+                {
+                    if (i.Name.Equals("TimeBackgroundTrigger"))
+                    {
+                        i.Unregister(true);//将之前的时间触发器任务注销
+                    }
+                }
+            }
 
             main.Navigate(typeof(ShowPage));
-
-            RegistTask();
         }
 
 
@@ -118,10 +134,15 @@ namespace Pixiv_Wallpaper_for_Win10
                 c.lastImg = img;
                 main.Navigate(typeof(ShowPage));//图片展示页面更新
 
-                //timer.Interval = TimeSpan.FromMinutes(c.time);
-                //timer.Start();
-
-                RegistTask(); //重新申请后台计时触发器
+                if(backgroundMode.Equals("BackgroundTask"))
+                {
+                    RegistTask(); //重新申请后台计时触发器
+                }
+                else
+                {
+                    timer.Interval = TimeSpan.FromMinutes(c.time);
+                    timer.Start();
+                }
                 return true;
             }
             else
@@ -135,20 +156,22 @@ namespace Pixiv_Wallpaper_for_Win10
                 var dialog = new MessageDialog("");
                 if (!UserProfilePersonalizationSettings.IsSupported())
                 {
-                    dialog.Content = "您的设备不支持自动更换壁纸";
-                    await dialog.ShowAsync();
+                    string title = "您的设备不支持自动更换壁纸";
+                    string content = " ";
+                    ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                    tm.ToastPush(60);
                     return;
                 }
                 UserProfilePersonalizationSettings settings = UserProfilePersonalizationSettings.Current;
                 StorageFile file = null;
                 try
                 {
-                    file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId));
+                    file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId + ".jpg"));
                 }
                 catch (Exception)
                 {
-                    //timer.Interval = TimeSpan.FromSeconds(2);
-                    //timer.Start();
+                    timer.Interval = TimeSpan.FromSeconds(2);
+                    timer.Start();
                 }
 
                 if (c.lockscr)
@@ -157,8 +180,10 @@ namespace Pixiv_Wallpaper_for_Win10
                     bool lockscr = await settings.TrySetLockScreenImageAsync(file);
                     if (!lockscr)
                     {
-                        dialog.Content = "更换锁屏操作失败。";
-                        await dialog.ShowAsync();
+                        string title = "更换锁屏操作失败";
+                        string content = " ";
+                        ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                        tm.ToastPush(60);
                     }
                 }
                 //更换壁纸
@@ -166,19 +191,21 @@ namespace Pixiv_Wallpaper_for_Win10
 
                 if (!deskscr)
                 {
-                    dialog.Content = "更换壁纸操作失败。";
-                    await dialog.ShowAsync();
+                    string title = "更换壁纸操作失败";
+                    string content = " ";
+                    ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                    tm.ToastPush(60);
                 }
                 else
                 {
                     //推送Toast通知
                     string title = "成功更换壁纸";
-                    string content = img.imgName + "/n"
-                        + "Id" + img.imgId + "/n" 
-                        + "作者:" + img.userName;
+                    string content = img.imgName + "\r\n"
+                        + "id" + img.imgId + "\r\n" 
+                        + "作者: " + img.userName;
                     string image = file.Path;
-                    ToastManagement tm = new ToastManagement(title, content, "WallpaperUpdate", image);
-                    tm.ToastPush(3);
+                    ToastManagement tm = new ToastManagement(title, content, ToastManagement.WallpaperUpdate, image);
+                    tm.ToastPush(10);
                 }
             }
         }
@@ -213,10 +240,9 @@ namespace Pixiv_Wallpaper_for_Win10
                     newSession.Dispose();
                     //建立Toast通知
                     string title = "Pixiv Wallpaper for Win10活动被禁止";
-                    string content = "由于系统限制，应用程序无法在后台继续活动，" +
-                        "若希望使此应用在后台活动，请尝试插入外部电源或更改电源设置";
-                    ToastManagement tm = new ToastManagement(title, content, "BackgroundDenied");
-                    tm.ToastPush(3);
+                    string content = "由于系统限制，应用程序无法在后台继续活动。";
+                    ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                    tm.ToastPush(120);
                     break;
             }
         }
@@ -233,10 +259,11 @@ namespace Pixiv_Wallpaper_for_Win10
                         break;
                     case ExtendedExecutionRevokedReason.SystemPolicy:
                         Debug.WriteLine("Extended execution revoked due to system policy.");
-                        string title = "Pixiv Wallpaper for Win10活动被系统关闭";
-                        string content = "系统回收了应用的会话资源，应用程序在后台时将会被挂起无法继续运行";
-                        ToastManagement tm = new ToastManagement(title, content, "SessionReinvoked");
-                        tm.ToastPush(3);
+                        string title = "Pixiv Wallpaper for Win10后台活动被系统关闭";
+                        string content = "系统回收了应用的会话资源，应用程序在后台时将会被挂起无法继续运行。" +
+                        "若希望使此应用在后台活动，请尝试插入外部电源或更改电源设置允许应用运行后台任务";
+                        ToastManagement tm = new ToastManagement(title, content, ToastManagement.ExtendedRevoked);
+                        tm.ToastPush(120);
                         break;
                 }
             });
@@ -248,42 +275,29 @@ namespace Pixiv_Wallpaper_for_Win10
             var status = await BackgroundExecutionManager.RequestAccessAsync();
             if(status == BackgroundAccessStatus.DeniedBySystemPolicy||status == BackgroundAccessStatus.Unspecified)
             {
-                Console.WriteLine(status.ToString());
                 string title = "应用后台活动被禁止";
-                string content = "由于应用程序权限限制，应用程序无法在后台活动，" +
+                string content = "由于系统限制，应用程序无法在后台活动。" +
                         "若希望使此应用在后台活动，请尝试更改电源设置以及插入外部电源";
-                ToastManagement tm = new ToastManagement(title,content,"BackgroundDenied");
-                tm.ToastPush(3);
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(120);
             }
-            //若Toast触发器之前已注册则无需重复注册
-            if (!BackgroundTaskRegistration.AllTasks.Any(i => i.Value.Name.Equals("ToastBackgroundTrigger")))
+            else
             {
-                // Create the background task
-                BackgroundTaskBuilder toastBuilder = new BackgroundTaskBuilder()
+                foreach (var i in BackgroundTaskRegistration.AllTasks.Values)
                 {
-                    Name = "ToastBackgroundTrigger"
-                };
-
-                // Assign the toast action trigger
-                toastBuilder.SetTrigger(new ToastNotificationActionTrigger());
-
-                // And register the task
-                BackgroundTaskRegistration registration = toastBuilder.Register();
-            }
-
-            foreach (var i in BackgroundTaskRegistration.AllTasks.Values)
-            {
-                if (i.Name.Equals("TimeBackgroundTrigger"))
-                {
-                    i.Unregister(true);//将之前的时间触发器任务注销
+                    if (i.Name.Equals("TimeBackgroundTrigger"))
+                    {
+                        i.Unregister(true);//将之前的时间触发器任务注销
+                    }
                 }
-            }
-            //注册新的时间触发器
-            BackgroundTaskBuilder timeBuilder = new BackgroundTaskBuilder();
-            timeBuilder.Name = "TimeBackgroundTrigger";
-            timeBuilder.SetTrigger(new TimeTrigger(Convert.ToUInt32(c.time), true));
-            timeBuilder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
-            BackgroundTaskRegistration task = timeBuilder.Register();
+                //注册新的时间触发器
+                BackgroundTaskBuilder timeBuilder = new BackgroundTaskBuilder();
+                timeBuilder.Name = "TimeBackgroundTrigger";
+                timeBuilder.SetTrigger(new TimeTrigger(Convert.ToUInt32(c.time), true));
+                timeBuilder.IsNetworkRequested = true;
+                timeBuilder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
+                BackgroundTaskRegistration task = timeBuilder.Register();
+            } 
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)     //汉堡视图开关

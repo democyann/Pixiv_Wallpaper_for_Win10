@@ -41,19 +41,20 @@ namespace Pixiv_Wallpaper_for_Win10
             combox1.Items.Add(new KeyValuePair<string, int>("120 分钟", 120));
             combox1.Items.Add(new KeyValuePair<string, int>("180 分钟", 180));
 
-            //值填充
+            combox2.Items.Add(new KeyValuePair<string, string>("拓展执行", "ExtendedSession"));
+            combox2.Items.Add(new KeyValuePair<string, string>("后台任务", "BackgroundTask"));
 
+            //值填充
             combox1.SelectedValue = c.time;
+            combox2.SelectedValue = c.backgroundMode;
 
             if(c.proxy)
             {
-                proxy_check.IsChecked = true;
-                //textbox3.IsEnabled = true;
+                proxyCheck.IsChecked = true;
             }
             else
             {
-                proxy_check.IsChecked = false; 
-                //textbox3.IsEnabled = false;
+                proxyCheck.IsChecked = false; 
             }
 
             if(c.cookie!=null&&!"".Equals(c.cookie))
@@ -68,7 +69,7 @@ namespace Pixiv_Wallpaper_for_Win10
             lock_switch.IsOn = c.lockscr;
             textbox1.Text = c.account;
             passwordbox1.Password = c.password;
-            textbox3.Text = c.proxy_port;
+            textbox3.Text = c.proxyPort;
 
             switch (c.mode)
             {
@@ -101,16 +102,16 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 c.mode = "You_Like_V2";   //设置本地保存文件 (模式) 为猜你喜欢(PixivCS)
             }
-            if(proxy_check.IsChecked == true)
+            if(proxyCheck.IsChecked == true)
             {
                 if (textbox3.Text != null)
                 {
-                    c.proxy_port = textbox3.Text;
+                    c.proxyPort = textbox3.Text;
                     c.proxy = true;
                 }
                 else
                 {
-                    proxy_check.IsChecked = false;
+                    proxyCheck.IsChecked = false;
                     c.proxy = false;
                 }                   
             }
@@ -119,13 +120,14 @@ namespace Pixiv_Wallpaper_for_Win10
                 c.proxy = false;
                 if (textbox3.Text != null)
                 {
-                    c.proxy_port = textbox3.Text;
+                    c.proxyPort = textbox3.Text;
                 }
             }
             c.lockscr = lock_switch.IsOn;
             c.account = textbox1.Text;     //保存账号
             c.password = passwordbox1.Password;    //保存密码
             c.time = (int)combox1.SelectedValue;    //保存时间
+            c.backgroundMode = combox2.SelectedValue.ToString(); //保存后台模式
         }
 
         private void SetCookie(string str)
@@ -188,12 +190,12 @@ namespace Pixiv_Wallpaper_for_Win10
             passwordbox1.IsEnabled = false;
         }
 
-        private void proxy_check_Checked(object sender, RoutedEventArgs e)
+        private void proxyCheck_Checked(object sender, RoutedEventArgs e)
         {
             textbox3.IsEnabled = true;
         }
 
-        private void proxy_check_Unchecked(object sender, RoutedEventArgs e)
+        private void proxyCheck_Unchecked(object sender, RoutedEventArgs e)
         {
             textbox3.IsEnabled = false;
         }

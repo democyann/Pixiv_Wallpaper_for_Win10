@@ -14,24 +14,27 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         private string title { get; set; }
         private string content { get; set; }
         private string image { get; set; }
-        private string mode { get; set; }
+        private int toastMode { get; set; }
         private readonly string logo = "ms-appdata:///Square44x44Logo.scale-200.png";
         private ToastVisual visual;
         private ToastActionsCustom actions;
         private ToastContent toastContent;
+        public const int ExtendedRevoked = 1;
+        public const int WallpaperUpdate = 2;
+        public const int ErrorMessage = 3;
 
-        public ToastManagement(string title,string content,string mode,string image = null)
+        public ToastManagement(string title,string content,int toastMode,string image = null)
         {
             this.title = title;
             this.content = content;
             this.image = image;
-            this.mode = mode;
+            this.toastMode = toastMode;
         }
         /// <summary>
         /// 推送本地Toast通知
         /// </summary>
-        /// <param name="hours">toast消息过期时间(小时)</param>
-        public void ToastPush(int hours)
+        /// <param name="minutes">toast消息过期时间(分钟)</param>
+        public void ToastPush(int minutes)
         {
             // Construct the visuals of the toast
             if(image != null)
@@ -89,29 +92,32 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 };
             }
             actions = new ToastActionsCustom();
-            switch (mode)
+            switch (toastMode)
             {
-                case "BackgroundDenied":
+                case ExtendedRevoked:
                     actions.Buttons.Add(new ToastButton("电源设置", new QueryString() { "action", "BatterySetting" }.ToString())
                     {
                         ActivationType = ToastActivationType.Protocol
                     });
                     break;
-                case "WallpaperUpdate":
+                case WallpaperUpdate:
                     actions.Buttons.Add(new ToastButton("下一张", new QueryString() { "action", "NextIllust" }.ToString())
                     {
-                        ActivationType = ToastActivationType.Background
+                        ActivationType = ToastActivationType.Foreground
                     });
+                    break;
+                case ErrorMessage:
+                    actions = null;
                     break;
             }
             toastContent = new ToastContent();
             toastContent.Visual = visual;
-            if(actions!=null)
+            if(actions != null)
             {
                 toastContent.Actions = actions;
             }
             var toast = new ToastNotification(toastContent.GetXml());
-            toast.ExpirationTime = DateTime.Now.AddHours(hours);
+            toast.ExpirationTime = DateTime.Now.AddMinutes(minutes);
             ToastNotificationManager.CreateToastNotifier().Show(toast);
         }
 

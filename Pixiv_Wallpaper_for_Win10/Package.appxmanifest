@@ -21,7 +21,7 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks"  StartPage="Pixiv_Wallpaper_for_Win10.MainPage">
+        <Extension Category="windows.backgroundTasks"      StartPage="Pixiv_Wallpaper_for_Win10.MainPage">
           <BackgroundTasks>
             <Task Type="timer"/>
             <Task Type="pushNotification"/>

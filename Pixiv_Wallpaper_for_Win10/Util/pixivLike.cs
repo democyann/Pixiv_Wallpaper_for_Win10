@@ -23,7 +23,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// </summary>
         /// <param name="flag">是否强制更新</param>
         /// <returns></returns>
-        public async Task ListUpdateV1(bool flag = false)
+        public async System.Threading.Tasks.Task ListUpdateV1(bool flag = false)
         {
             if(like==null||like.Count==0||flag)
             { 
@@ -82,12 +82,16 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             else
             {
                 //使UI线程调用lambda表达式内的方法
-                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                /*await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                 {
                     //UI code here
                     MessageDialog dialog = new MessageDialog("更新推荐列表失败");
                     await dialog.ShowAsync();
-                });
+                });*/
+                string title = "获取pixiv推荐列表失败";
+                string content = "请检查网络连接，并尝试清理cookie与token";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
             }
             return img;
         }
@@ -118,12 +122,16 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             else 
             {
                 //使UI线程调用lambda表达式内的方法
-                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                /*await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                 {
                     //UI code here
                     MessageDialog dialog = new MessageDialog("更新推荐列表失败");
                     await dialog.ShowAsync();
-                });
+                });*/
+                string title = "获取pixiv推荐列表失败";
+                string content = " ";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
             }
             return img;
         }
