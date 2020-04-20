@@ -14,7 +14,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
 using Windows.Storage;
-using Pixiv_Wallpaper_for_Win10.Util;
+using Pixiv_Wallpaper_for_Windows_10.Util;
 using System.Collections;
 using System.Threading;
 using Windows.System.UserProfile;
@@ -26,7 +26,7 @@ using Windows.UI.Core;
 using Windows.UI.Notifications;
 using Windows.ApplicationModel.Background;
 
-namespace Pixiv_Wallpaper_for_Win10
+namespace Pixiv_Wallpaper_for_Windows_10
 {
     /// <summary>
     /// 主界面
@@ -239,7 +239,7 @@ namespace Pixiv_Wallpaper_for_Win10
                 case ExtendedExecutionResult.Denied:
                     newSession.Dispose();
                     //建立Toast通知
-                    string title = "Pixiv Wallpaper for Win10活动被禁止";
+                    string title = "Pixiv Wallpaper for Windows 10活动被禁止";
                     string content = "由于系统限制，应用程序无法在后台继续活动。";
                     ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
                     tm.ToastPush(120);
@@ -259,7 +259,7 @@ namespace Pixiv_Wallpaper_for_Win10
                         break;
                     case ExtendedExecutionRevokedReason.SystemPolicy:
                         Debug.WriteLine("Extended execution revoked due to system policy.");
-                        string title = "Pixiv Wallpaper for Win10后台活动被系统关闭";
+                        string title = "Pixiv Wallpaper for Windows 10后台活动被系统关闭";
                         string content = "系统回收了应用的会话资源，应用程序在后台时将会被挂起无法继续运行。" +
                         "若希望使此应用在后台活动，请尝试插入外部电源或更改电源设置允许应用运行后台任务";
                         ToastManagement tm = new ToastManagement(title, content, ToastManagement.ExtendedRevoked);
@@ -300,7 +300,7 @@ namespace Pixiv_Wallpaper_for_Win10
             } 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)     //汉堡视图开关
+        private void Button_Click(object sender, RoutedEventArgs e)     //导航视图开关
         {
             lis.IsPaneOpen = !lis.IsPaneOpen;
         }

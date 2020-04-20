@@ -21,7 +21,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace Pixiv_Wallpaper_for_Win10
+namespace Pixiv_Wallpaper_for_Windows_10
 {
     /// <summary>
     /// 提供特定于应用程序的行为，以补充默认的应用程序类。
@@ -114,7 +114,7 @@ namespace Pixiv_Wallpaper_for_Win10
             {
                 var toastActivationArgs = e as ToastNotificationActivatedEventArgs;
                 QueryString args = QueryString.Parse(toastActivationArgs.Argument);
-                switch (args["action"])
+                switch (args.ToString())
                 {
                     case "action&NextIllust":
                         MainPage.mp.SetWallpaper(await MainPage.mp.update());

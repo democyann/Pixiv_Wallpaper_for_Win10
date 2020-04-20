@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 using Windows.UI.Popups;
 using System.Collections.Concurrent;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
     class PixivLike
     {

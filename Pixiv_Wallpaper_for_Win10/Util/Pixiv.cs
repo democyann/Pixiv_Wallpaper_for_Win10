@@ -16,7 +16,7 @@ using System.Collections.Concurrent;
 using System.Web;
 using System.IO;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
     public class Pixiv
     {

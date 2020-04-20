@@ -7,7 +7,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.QueryStringDotNET;
 using Windows.UI.Notifications;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
     class ToastManagement
     {

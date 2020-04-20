@@ -11,7 +11,7 @@ using Windows.UI.Xaml.Hosting;
 using Windows.Web.Http;
 using Windows.Web.Http.Filters;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
     class WebViewLogin
     {
@@ -33,7 +33,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             this.targetUri = targetUri;
         }
 
-        public async System.Threading.Tasks.Task ShowWebView(int width,int height)
+        public async Task ShowWebView(int width,int height)
         {
             appWindow = await AppWindow.TryCreateAsync();
             webView.Width = width;

@@ -7,8 +7,8 @@
     <ProjectGuid>{6636CDA5-5FC9-49DC-822E-9720E7C12284}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Pixiv_Wallpaper_for_Win10</RootNamespace>
-    <AssemblyName>Pixiv_Wallpaper_for_Win10</AssemblyName>
+    <RootNamespace>Pixiv_Wallpaper_for_Windows_10</RootNamespace>
+    <AssemblyName>Pixiv_Wallpaper_for_Windows 10</AssemblyName>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.18362.0</TargetPlatformVersion>

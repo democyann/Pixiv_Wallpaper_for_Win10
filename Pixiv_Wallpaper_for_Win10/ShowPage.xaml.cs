@@ -15,11 +15,11 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
-using Pixiv_Wallpaper_for_Win10.Util;
+using Pixiv_Wallpaper_for_Windows_10.Util;
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
 
-namespace Pixiv_Wallpaper_for_Win10
+namespace Pixiv_Wallpaper_for_Windows_10
 {
     /// <summary>
     /// 图片预览界面

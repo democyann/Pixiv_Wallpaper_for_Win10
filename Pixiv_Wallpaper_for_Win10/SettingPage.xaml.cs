@@ -13,14 +13,14 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
-using Pixiv_Wallpaper_for_Win10.Util;
+using Pixiv_Wallpaper_for_Windows_10.Util;
 using System.Collections.ObjectModel;
 using Windows.System;
 using System.Threading.Tasks;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
-namespace Pixiv_Wallpaper_for_Win10
+namespace Pixiv_Wallpaper_for_Windows_10
 {
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
