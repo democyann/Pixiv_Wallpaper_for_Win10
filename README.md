@@ -1,11 +1,12 @@
-# Pixiv_Wallpaper_for_Win10
-抓取Pixiv.net的图片并设置为Win10壁纸的UWP APP，需要在Windows10 1903以上的版本环境中运行。
-有top50与"为你推荐"两种模式，"为你推荐"需要登录账号。
-目前需要登录的操作(为你推荐模块)在中国大陆区域需要走代理才能连接，Top50功能不受影响可以直接连接。
-由于Pixiv.net更新了Google reCAPTCHA v3,以往的通过web端模拟的登录方式失效，现改为通过WebView登录获取Cookie来进行后续操作。除此之外还包含了基于PixivCS( https://github.com/tobiichiamane/pixivcs/blob/master/PixivAppAPI.cs )的部分功能，部分代码参考https://github.com/tobiichiamane/pixivfs-uwp
+# Pixiv Wallpaper for Windows 10
+抓取pixiv.net的图片并设置为Windows 10桌面壁纸的UWP APP，需要在Windows 10 1903以上的版本系统中运行。
 
-预览图:
-![Image text](https://github.com/democyann/Pixiv_Wallpaper_for_Win10/blob/relife/Pixiv_Wallpaper_for_Win10/preview_img/N8QG~I%7BTZK%5B115CMF60BCX0.png)
+依赖部分NuGet包，没有多语种支持，目前只有简体中文一种语言。
 
-![Image text]
-(https://github.com/democyann/Pixiv_Wallpaper_for_Win10/blob/relife/Pixiv_Wallpaper_for_Win10/preview_img/RX5E@ZD%5B7_%60(%25~PYAAY%25%60P5.png )
+有top50与"猜你喜欢"两种模式，"猜你喜欢"对应网页pixiv/discovery内容，需要登录pixiv账号。
+
+有两种登录模式供选择，一种采用WebView登录，支持外部账号关联登录(如weibo、Twitter账号登录)，该模式下均使用pixiv web接口进行http通信;
+PixivCS登录模式采用[PixivCS](https://github.com/tobiichiamane/pixivcs/blob/master/PixivAppAPI.cs/ "PixivCS")API，内部大部分使用ios客户端进行通信。部分代码参考[pixivfs](https://github.com/tobiichiamane/pixivfs-uwp/ "pixivfs")项目
+
+## UWP使用代理
+您需要自己准备代理服务器与代理软件，通过全局代理或者PAC代理+[Loopback](https://sspai.com/post/41137 "UWP loopback")的方式解决访问pixiv.net的问题。
