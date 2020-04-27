@@ -52,14 +52,6 @@ namespace Pixiv_Wallpaper_for_Windows_10
             session = null;
             backgroundMode = c.backgroundMode;
 
-            if(c.proxy == true)
-            {
-                HttpUtil.proxyPort = c.proxyPort;
-            }
-            else
-            {
-                HttpUtil.proxyPort = null;
-            }
             //后台模式选择
             if(backgroundMode.Equals("BackgroundTask"))
             {

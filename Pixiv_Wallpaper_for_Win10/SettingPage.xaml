@@ -40,13 +40,6 @@
                     <Button Name="openFilePath" Content="访问图片文件夹" Margin="30,10,0,0" Click="openFilePath_Click" RequestedTheme="Dark"/>
                     <Button Name="cleanToken" Content="清理token与cookie" Margin="30,10,0,0" Click="cleanToken_Click" RequestedTheme="Dark"/>
                 </StackPanel>
-                <TextBlock Text="HTTP代理" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
-                <TextBlock Text="使用HTTP代理处理应用程序的网络通信此项更改将在下一次启动程序时生效" FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark" TextWrapping="WrapWholeWords"/>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox Name="proxyCheck" Margin="30,10,0,0" RequestedTheme="Dark" Content="开启HTTP代理" Checked="proxyCheck_Checked" Unchecked="proxyCheck_Unchecked"/>
-                    <TextBlock Text="代理端口" Margin="30,15,0,0" FontSize="15" RequestedTheme="Dark"/>
-                    <TextBox x:Name="textbox3" Margin="10,10,0,0"  Width="70" RequestedTheme="Dark" InputScope="Number"/>
-                </StackPanel>
                 <TextBlock Text="后台模式" Margin="30,10,0,0" FontSize="20" RequestedTheme="Dark"/>
                 <TextBlock Text="拓展执行模式使得应用程序在失去用户焦点后也不会进入休眠；后台任务模式将使应用程序在后台休眠时可被触发器定时唤醒进行30秒的后台活动，超时将使应用程序被关闭" 
                            FontSize="15" Margin="30,10,0,0" RequestedTheme="Dark" TextWrapping="WrapWholeWords"/>

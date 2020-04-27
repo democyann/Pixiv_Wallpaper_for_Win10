@@ -45,11 +45,6 @@ namespace Pixiv_Wallpaper_for_Windows_10.Util
         private Contype dataType;
 
         /// <summary>
-        /// 设置或获取代理端口
-        /// </summary>
-        public static string proxyPort{ get; set; }
-
-        /// <summary>
         /// 设置或获取Cookie
         /// </summary>
         public string cookie { get; set; }
@@ -100,12 +95,6 @@ namespace Pixiv_Wallpaper_for_Windows_10.Util
             if (referrer != null)
             {
                 request.Headers["Referer"] = referrer;
-            }
-            if(proxyPort!=null)
-            {
-                int port = int.Parse(proxyPort);
-                WebProxy proxyObject = new WebProxy("127.0.0.1",port);
-                request.Proxy = proxyObject;
             }
 
             try
@@ -168,13 +157,7 @@ namespace Pixiv_Wallpaper_for_Windows_10.Util
             {
                 request.Headers["Referer"] = referrer;
             }
-            if (proxyPort != null)
-            {
-                int port = int.Parse(proxyPort);
-                WebProxy proxyObject = new WebProxy("127.0.0.1", port);
-                request.Proxy = proxyObject;
-            }
-
+            
             Stream write = await request.GetRequestStreamAsync();
             write.Write(databit, 0, databit.Length);
             write.Dispose();
@@ -225,12 +208,6 @@ namespace Pixiv_Wallpaper_for_Windows_10.Util
         {
             //应访问一次插画展示页使pixiv记录一次浏览数以尊重他人成果
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(referrer);
-            if (proxyPort != null)
-            {
-                int port = int.Parse(proxyPort);
-                WebProxy proxyObject = new WebProxy("127.0.0.1", port);
-                request.Proxy = proxyObject;
-            }
             request.Method = "GET";
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
@@ -239,12 +216,6 @@ namespace Pixiv_Wallpaper_for_Windows_10.Util
 
             //正式开始获取插画原图
             request = (HttpWebRequest)WebRequest.Create(url);
-            if (proxyPort != null)
-            {
-                int port = int.Parse(proxyPort);
-                WebProxy proxyObject = new WebProxy("127.0.0.1", port);
-                request.Proxy = proxyObject;
-            }
             request.Method = "GET";
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;

@@ -48,15 +48,6 @@ namespace Pixiv_Wallpaper_for_Windows_10
             combox1.SelectedValue = c.time;
             combox2.SelectedValue = c.backgroundMode;
 
-            if(c.proxy)
-            {
-                proxyCheck.IsChecked = true;
-            }
-            else
-            {
-                proxyCheck.IsChecked = false; 
-            }
-
             if(c.cookie!=null&&!"".Equals(c.cookie))
             {
                 loginV1.Content = "已登录";
@@ -69,7 +60,6 @@ namespace Pixiv_Wallpaper_for_Windows_10
             lock_switch.IsOn = c.lockscr;
             textbox1.Text = c.account;
             passwordbox1.Password = c.password;
-            textbox3.Text = c.proxyPort;
 
             switch (c.mode)
             {
@@ -102,27 +92,7 @@ namespace Pixiv_Wallpaper_for_Windows_10
             {
                 c.mode = "You_Like_V2";   //设置本地保存文件 (模式) 为猜你喜欢(PixivCS)
             }
-            if(proxyCheck.IsChecked == true)
-            {
-                if (textbox3.Text != null)
-                {
-                    c.proxyPort = textbox3.Text;
-                    c.proxy = true;
-                }
-                else
-                {
-                    proxyCheck.IsChecked = false;
-                    c.proxy = false;
-                }                   
-            }
-            else
-            {
-                c.proxy = false;
-                if (textbox3.Text != null)
-                {
-                    c.proxyPort = textbox3.Text;
-                }
-            }
+            
             c.lockscr = lock_switch.IsOn;
             c.account = textbox1.Text;     //保存账号
             c.password = passwordbox1.Password;    //保存密码
@@ -188,16 +158,6 @@ namespace Pixiv_Wallpaper_for_Windows_10
         {
             textbox1.IsEnabled = false;
             passwordbox1.IsEnabled = false;
-        }
-
-        private void proxyCheck_Checked(object sender, RoutedEventArgs e)
-        {
-            textbox3.IsEnabled = true;
-        }
-
-        private void proxyCheck_Unchecked(object sender, RoutedEventArgs e)
-        {
-            textbox3.IsEnabled = false;
         }
     }
 }

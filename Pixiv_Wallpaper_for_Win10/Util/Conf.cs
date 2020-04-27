@@ -192,48 +192,7 @@ namespace Pixiv_Wallpaper_for_Windows_10.Util
             }
         }
 
-        /// <summary>
-        /// HTTP代理开关
-        /// </summary>
-        public bool proxy
-        {
-            get
-            {
-                if (localSettings.Values["proxy"] == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    return Convert.ToBoolean(localSettings.Values["proxy"]);
-                }
-            }
-            set
-            {
-                localSettings.Values["proxy"] = value;
-            }
-        }
-
-        /// <summary>
-        /// 代理端口
-        /// </summary>
-        public string proxyPort
-        {
-            get
-            {
-                if (localSettings.Values["proxy_port"] == null)
-                {
-                    return "";
-                }
-                else
-                    return localSettings.Values["proxy_port"].ToString();
-            }
-            set
-            {
-                localSettings.Values["proxy_port"] = value;
-            }
-        }
-
+        
         /// <summary>
         /// 后台模式
         /// </summary>
