@@ -8,11 +8,16 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using System.Diagnostics;
 using System.IO.Compression;
+using Windows.UI.Popups;
+using Windows.UI.Xaml;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
     public class HttpUtil
     {
+        public HttpUtil()
+        {  
+        }
         public enum Contype
         {
             /// <summary>
@@ -34,8 +39,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             "image/webp,image/apng,image/*,*/*;q=0.8"
         };
 
-        private static readonly String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
-
+        private static readonly String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36";
 
         private string url;
         private Contype dataType;
@@ -48,10 +52,15 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// <summary>
         /// 获取或设置原引用地址
         /// </summary>
-        public string referer { get; set; }
+        public string referrer { get; set; }
 
         /// <summary>
-        /// 
+        /// 获取或设置认证网址
+        /// </summary>
+        public string authority { get; set; }
+
+        /// <summary>
+        ///   
         /// </summary>
         /// <param name="url">要请求的 URL</param>
         /// <param name="dataType">要请求的 MIME 类型</param>
@@ -59,6 +68,9 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         {
             this.url = url;
             this.dataType = dataType;
+
+            ServicePointManager.ServerCertificateValidationCallback += (s, cert, chain, sslPolicyErrors) => true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         }
 
 
@@ -73,29 +85,58 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
             request.Headers["Accept-Encoding"] = "gzip,deflate,sdch";
-            request.Headers["User-Agent"] = USER_AGENT;
-            if (referer != null)
+            request.UserAgent = USER_AGENT;
+            request.Headers["Scheme"] = "https";
+            request.Headers["Authority"] = "www.pixiv.net";
+            if (authority != null)
             {
-                request.Headers["Referer"] = referer;
+                request.Headers["Authority"] = authority;
+            }           
+            if (referrer != null)
+            {
+                request.Headers["Referer"] = referrer;
             }
-            HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-            string res = "Error";
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                Stream s = response.GetResponseStream();
-                if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
-                {
-                    s = new GZipStream(s, CompressionMode.Decompress);
-                }
-                StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
-                res = await sr.ReadToEndAsync();
-                cookie = response.Headers["Set-Cookie"];
 
-                sr.Dispose();
-                s.Dispose();
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                string res = "Error";
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    Stream s = response.GetResponseStream();
+                    if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                    {
+                        s = new GZipStream(s, CompressionMode.Decompress);
+                    }
+                    StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
+                    res = await sr.ReadToEndAsync();
+                    cookie = response.Headers["Set-Cookie"];
+
+                    sr.Dispose();
+                    s.Dispose();  
+                }
+                response.Dispose();
+                return res;
             }
-            response.Dispose();
-            return res;
+            catch(Exception e)
+            {
+                //使UI线程调用lambda表达式内的方法
+                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("");
+                    if ("The remote server returned an error: (403) .".Equals(e.Message))
+                    {
+                        dialog.Content = "请确认是否已登录或尝试清除Cookie与token后再次登录";
+                    }
+                    else
+                    {
+                        dialog.Content = e.Message.ToString();
+                    }  
+                    await dialog.ShowAsync();
+                });
+                return "ERROR";
+            }
         }
         /// <summary>
         /// HTTP POST 请求
@@ -110,92 +151,119 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
             request.Headers["Accept-Encoding"] = "gzip,deflate,sdch";
-            request.Headers["User-Agent"] = USER_AGENT;
+            request.UserAgent = USER_AGENT;
             request.ContentType = "application/x-www-form-urlencoded";
-            if (referer != null)
+            if (referrer != null)
             {
-                request.Headers["Referer"] = referer;
+                request.Headers["Referer"] = referrer;
             }
-
+            
             Stream write = await request.GetRequestStreamAsync();
             write.Write(databit, 0, databit.Length);
             write.Dispose();
 
-            HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-            string res = "ERROR";
-            if (response.StatusCode == HttpStatusCode.OK)
+            try
             {
-                Stream s = response.GetResponseStream();
-
-                if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                string res = "ERROR";
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    s = new GZipStream(s, CompressionMode.Decompress);
+                    Stream s = response.GetResponseStream();
+
+                    if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].ToLower().Contains("gzip"))
+                    {
+                        s = new GZipStream(s, CompressionMode.Decompress);
+                    }
+                    StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
+                    res = await sr.ReadToEndAsync();
+                    cookie = response.Headers["Set-Cookie"];
+                    sr.Dispose();
+                    s.Dispose();
                 }
+                response.Dispose();
 
-                StreamReader sr = new StreamReader(s, Encoding.GetEncoding("utf-8"));
-                res = await sr.ReadToEndAsync();
-                cookie = response.Headers["Set-Cookie"];
-
-                sr.Dispose();
-                s.Dispose();
-
+                return res;
             }
-            response.Dispose();
-
-            return res;
+            catch(Exception e)
+            {
+                //使UI线程调用lambda表达式内的方法
+                await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("");
+                    dialog.Content = e.Message.ToString();
+                    await dialog.ShowAsync();
+                });
+                return "ERROR";
+            }
+            
         }
         /// <summary>
-        /// 图片下载方法
+        /// 插画下载方法
         /// </summary>
-        /// <param name="userid">图片作者ID</param>
-        /// <param name="imgid">图片ID</param>
-        /// <returns>图片存储地址</returns>
+        /// <param name="userid">插画作者ID</param>
+        /// <param name="imgid">插画ID</param>
+        /// <returns>插画存储地址</returns>
         public async Task<string> ImageDownloadAsync(string imgid)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            //应访问一次插画展示页使pixiv记录一次浏览数以尊重他人成果
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(referrer);
             request.Method = "GET";
             request.Accept = contype[(int)dataType];
             request.Headers["Cookie"] = cookie;
-            request.Headers["Referer"] = referer;
+            request.Headers["Referer"] = "https://www.pixiv.net/discovery";
+            await request.GetResponseAsync();
 
-            HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+            //正式开始获取插画原图
+            request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "GET";
+            request.Accept = contype[(int)dataType];
+            request.Headers["Cookie"] = cookie;
+            request.Headers["Referer"] = referrer;
 
-            if (response.StatusCode == HttpStatusCode.OK)
+            try
             {
-                Stream s = response.GetResponseStream();
-
-                if (await ApplicationData.Current.LocalFolder.TryGetItemAsync(imgid) == null)
+                //判断文件夹中是否已存在该插画，若存在则直接返回该插画
+                if(await ApplicationData.Current.LocalFolder.TryGetItemAsync(imgid + ".jpg")!=null)
                 {
-                    StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(imgid, CreationCollisionOption.OpenIfExists);
-                    Stream write = await file.OpenStreamForWriteAsync();
-                    int l;
-                    long a = 0;
-                    do
-                    {
-                        byte[] temp = new byte[1024];
-                        l = s.Read(temp, 0, 1024);
-                        if (l > 0)
-                        {
-                            await write.WriteAsync(temp, 0, l);
-                        }
-                        a += l;
-
-                    } while (l > 0);
-
-                    write.Dispose();
-                    s.Dispose();
+                    return imgid;
                 }
-            }
-            else
+                else
+                {
+                    HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        using (Stream res = response.GetResponseStream())
+                        {
+
+                            StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(imgid + ".jpg", CreationCollisionOption.ReplaceExisting);
+                            using (Stream writer = await file.OpenStreamForWriteAsync())
+                            {
+                                await res.CopyToAsync(writer);
+                                return imgid;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string title = "获取插画时连接失败";
+                        string content = "尝试从pixiv下载插画时连接超时，请检查网络连接";
+                        ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                        tm.ToastPush(60);
+                        return "ERROR";
+                    }
+                }
+            }    
+            catch(Exception)
             {
+                string title = "获取插画时连接中断";
+                string content = "在从pixiv服务器下载插画时连接中断，请检查网络连接";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
                 return "ERROR";
             }
 
-            response.Dispose();
-
-            return imgid;
-
         }
-
     }
 }

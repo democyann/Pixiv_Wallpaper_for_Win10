@@ -6,82 +6,147 @@ using System.Threading.Tasks;
 using System.Collections;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Windows.UI.Popups;
+using System.Collections.Concurrent;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
     class PixivLike
     {
-        private ArrayList like = new ArrayList();
-        private Pixiv pixiv=new Pixiv();
-        private Conf c=new Conf();
-        private ImageInfo img=new ImageInfo();
-        public PixivLike()
-        {
-            pixiv = new Pixiv();
-            c = new Conf();
-        }
-        public async Task<ArrayList>  ListUpdate(bool flag=false)
+        private ConcurrentQueue<string> like = new ConcurrentQueue<string>();
+        private ConcurrentQueue<ImageInfo> likeV2 = new ConcurrentQueue<ImageInfo>();
+        private Pixiv pixiv = new Pixiv();
+        private Conf c = new Conf();
+
+        /// <summary>
+        /// 列表更新1
+        /// </summary>
+        /// <param name="flag">是否强制更新</param>
+        /// <returns></returns>
+        public async System.Threading.Tasks.Task ListUpdateV1(bool flag = false)
         {
             if(like==null||like.Count==0||flag)
-            {
-                like =await pixiv.getRecommlist();
+            { 
+                like = await pixiv.getRecommlistV1(); 
             }
-            return like;
         }
-        public async Task<ImageInfo> SelectArtWork()
-        {
-            if(c.account.Equals("")|| c.password.Equals(""))
-            {
-                return null;
-            }
 
+        /// <summary>
+        /// 使用Web模拟登录的选择方式
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ImageInfo> SelectArtWorkV1()
+        {
             if (pixiv.token == null || pixiv.token.Equals(""))
             {
                 if (c.token.Equals(""))
                 {
-                    if (!await pixiv.getToken(true))
+                    if (!await pixiv.getToken(c.cookie))            //getToken不成功，返回null
                     {
                         return null;
                     }
-                    else
+                    else                                       //getToken成功，将token写入配置文件
                     {
                         c.cookie = pixiv.cookie;
                         c.token = pixiv.token;
                     }
                 }
-                else
+                else                                          //配置文件中已有token，直接调用(可能出现token过期情况)
                 {
                     pixiv.cookie = c.cookie;
                     pixiv.token = c.token;
                 }
             }
             
-
-            
-
-            await ListUpdate();
+            await ListUpdateV1();
             ImageInfo img = null;
             if(like!=null&&like.Count!=0)
             {
-                Random r = new Random();
                 while (true)
                 {
-                    int number=r.Next(0, like.Count);
-                    string id = like[number].ToString();
-                    img = await pixiv.getImageInfo(id);
-                    if (like[number]!=null&& img.WHratio>=1.33)
+                    string id = "";
+                    if(like.TryDequeue(out id))
                     {
-                        await pixiv.downloadImg(img);
+                        img = await pixiv.getImageInfo(id);
+                    }
+                    if (img!=null&&img.WHratio>=1.33&&!img.isR18)
+                    {
+                        if(!await pixiv.downloadImg(img))         //当获取插画失败时返回null
+                        {
+                            img = null;
+                        }
                         break;
                     }
-                    else
-                    {
-                        like.RemoveAt(number);
-                    }
-                   
                 }
             }
+            else
+            {
+                //使UI线程调用lambda表达式内的方法
+                /*await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("更新推荐列表失败");
+                    await dialog.ShowAsync();
+                });*/
+                string title = "获取pixiv推荐列表失败";
+                string content = "请检查网络连接，并尝试清理cookie与token";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
+            }
             return img;
+        }
+
+        /// <summary>
+        /// 使用PixivCS API的选择方法
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ImageInfo> SelectArtWorkV2()
+        {
+            await ListUpdateV2();
+            ImageInfo img = null;
+            if(likeV2!=null&&likeV2.Count!=0)
+            {
+                while (true)
+                {
+                    likeV2.TryDequeue(out img);
+                    if (img != null && img.WHratio >= 1.33 && !img.isR18)
+                    {
+                        if(!await pixiv.downloadImgV2(img))              //当获取插画失败时返回null
+                        {
+                            img = null;
+                        }
+                        break;
+                    }
+                }
+            }
+            else 
+            {
+                //使UI线程调用lambda表达式内的方法
+                /*await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("更新推荐列表失败");
+                    await dialog.ShowAsync();
+                });*/
+                string title = "获取pixiv推荐列表失败";
+                string content = " ";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
+            }
+            return img;
+        }
+
+        /// <summary>
+        /// 列表更新方式2
+        /// </summary>
+        /// <param name="flag">是否强制更新</param>
+        /// <returns></returns>
+        public async Task ListUpdateV2(bool flag = false)
+        {
+            if(flag || likeV2.Count==0 || like == null)
+            {
+                likeV2 = await pixiv.getRecommenlistV2(c.account,c.password);
+            }
         }
     }
 }

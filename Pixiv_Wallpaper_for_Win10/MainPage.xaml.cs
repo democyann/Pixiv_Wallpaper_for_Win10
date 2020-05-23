@@ -14,14 +14,19 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
 using Windows.Storage;
-using Pixiv_Wallpaper_for_Win10.Util;
+using Pixiv_Wallpaper_for_Windows_10.Util;
 using System.Collections;
 using System.Threading;
 using Windows.System.UserProfile;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Media.Imaging;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.ExtendedExecution;
+using Windows.UI.Core;
+using Windows.UI.Notifications;
+using Windows.ApplicationModel.Background;
 
-namespace Pixiv_Wallpaper_for_Win10
+namespace Pixiv_Wallpaper_for_Windows_10
 {
     /// <summary>
     /// 主界面
@@ -30,158 +35,264 @@ namespace Pixiv_Wallpaper_for_Win10
     public sealed partial class MainPage : Page
     {
         private DispatcherTimer timer;  //图片推送定时器
-        private DispatcherTimer li_uptimer; //列表更新定时器
-
         private Conf c;
+        private ImageInfo img;
+        public static MainPage mp;
+        private ExtendedExecutionSession session;
         private PixivTop50 top50;
         private PixivLike like;
-        private ImageInfo img;
+        private string backgroundMode;
 
         public MainPage()
         {
             this.InitializeComponent();
+            mp = this;
             c = new Conf();
-            top50 = new PixivTop50();
-            like = new PixivLike();
+            img = c.lastImg;
+            session = null;
+            backgroundMode = c.backgroundMode;
 
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMinutes(c.time);
-            timer.Tick += Timer_Tick;
-            timer.Start();
-
-            li_uptimer = new DispatcherTimer();
-            li_uptimer.Interval = TimeSpan.FromHours(1);
-            li_uptimer.Tick += Li_uptimer_Tick;
-            li_uptimer.Start();
-
-            if (c.lastImg != null)
+            //后台模式选择
+            if(backgroundMode.Equals("BackgroundTask"))
             {
-                ImageBrush br = new ImageBrush();
-                br.Stretch = Stretch.UniformToFill;
-                br.AlignmentX = AlignmentX.Left;
-                br.AlignmentY = AlignmentY.Top;
-                br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + c.lastImg.imgId));
-                gr.Background = br;
+                RegistTask(); //注册后台任务以及时间触发器
             }
             else
             {
-                ImageBrush br = new ImageBrush();
-                br.Stretch = Stretch.UniformToFill;
-                br.AlignmentX = AlignmentX.Left;
-                br.AlignmentY = AlignmentY.Top;
-                br.ImageSource = new BitmapImage(new Uri("ms-appx:///Res/62258773_p0.png"));
-                gr.Background = br;
+                timer = new DispatcherTimer();
+                timer.Interval = TimeSpan.FromMinutes(c.time);
+                timer.Tick += Timer_Tick;
+                timer.Start();
+                BeginExtendedExecution(); //申请延迟挂起
+
+                foreach (var i in BackgroundTaskRegistration.AllTasks.Values)
+                {
+                    if (i.Name.Equals("TimeBackgroundTrigger"))
+                    {
+                        i.Unregister(true);//将之前的时间触发器任务注销
+                    }
+                }
             }
 
             main.Navigate(typeof(ShowPage));
         }
 
-        private async void Li_uptimer_Tick(object sender, object e)
-        {
-            //定时更新列表(1h/次)
-            switch (c.mode)
-            {
-                case "Top_50":
-                    await top50.listUpdate(true);
-                    break;
-                case "You_Like":
-                    await like.ListUpdate(true);
-                    break;
-                default:
-                    await top50.listUpdate(true);
-                    break;
-            }
-            li_uptimer.Interval = TimeSpan.FromHours(1);
-            li_uptimer.Start();
-        }
 
-        private void Timer_Tick(object sender, object e)
+        private async void Timer_Tick(object sender, object e)
         {
-            update();
+            SetWallpaper(await update());
         }
         /// <summary>
         /// 作品更新并显示
         /// </summary>
-        private async void update()
+        public async Task<bool> update()
         {
-            timer.Stop();
-            var dialog = new MessageDialog("");
+            //timer.Stop();
 
-            //ImageInfo img;
             switch (c.mode)
             {
                 case "Top_50":
-                    img = await top50.SelectArtWork();
+                    if(top50 == null)
+                    {
+                        top50 = new PixivTop50();
+                    }
+                    await Task.Run(async () => { img = await top50.SelectArtWork(); });         
                     break;
-                case "You_Like":
-                    img = await like.SelectArtWork();
+                case "You_Like_V1":
+                    if(like == null)
+                    {
+                        like = new PixivLike();
+                    }
+                    await Task.Run(async () => { img = await like.SelectArtWorkV1(); });
+                    break;
+                case "You_Like_V2":
+                    if (like == null)
+                    {
+                        like = new PixivLike();
+                    }
+                    img = await like.SelectArtWorkV2(); //该API在UI线程被建立，不支持从子线程调用
                     break;
                 default:
-                    img = await top50.SelectArtWork();
+                    if (top50 == null)
+                    {
+                        top50 = new PixivTop50();
+                    }
+                    await Task.Run(async () => { img = await top50.SelectArtWork(); });
                     break;
             }
 
             if (img != null)
             {
                 c.lastImg = img;
-                main.Navigate(typeof(ShowPage));
-            }
+                main.Navigate(typeof(ShowPage));//图片展示页面更新
 
-
-            if (!UserProfilePersonalizationSettings.IsSupported())
-            {
-                dialog.Content = "您的设备不支持自动更换壁纸";
-                await dialog.ShowAsync();
-                return;
-            }
-            UserProfilePersonalizationSettings settings = UserProfilePersonalizationSettings.Current;
-            StorageFile file = null;
-            try
-            {
-                file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId));
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                timer.Interval = TimeSpan.FromSeconds(2);
-                timer.Start();
-            }
-
-            if (c.lockscr >= 1)
-            {
-                //更换锁屏
-                bool lockscr = await settings.TrySetLockScreenImageAsync(file);
-                if (!lockscr)
+                if(backgroundMode.Equals("BackgroundTask"))
                 {
-                    dialog.Content = "更换锁屏操作失败。";
-                    await dialog.ShowAsync();
+                    RegistTask(); //重新申请后台计时触发器
                 }
+                else
+                {
+                    timer.Interval = TimeSpan.FromMinutes(c.time);
+                    timer.Start();
+                }
+                return true;
             }
-            if (c.lockscr != 1)
+            else
+                return false;
+        }
+
+        public async void SetWallpaper(bool done)
+        {
+            if(done)
             {
+                var dialog = new MessageDialog("");
+                if (!UserProfilePersonalizationSettings.IsSupported())
+                {
+                    string title = "您的设备不支持自动更换壁纸";
+                    string content = " ";
+                    ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                    tm.ToastPush(60);
+                    return;
+                }
+                UserProfilePersonalizationSettings settings = UserProfilePersonalizationSettings.Current;
+                StorageFile file = null;
+                try
+                {
+                    file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/" + img.imgId + ".jpg"));
+                }
+                catch (Exception)
+                {
+                    timer.Interval = TimeSpan.FromSeconds(2);
+                    timer.Start();
+                }
+
+                if (c.lockscr)
+                {
+                    //更换锁屏
+                    bool lockscr = await settings.TrySetLockScreenImageAsync(file);
+                    if (!lockscr)
+                    {
+                        string title = "更换锁屏操作失败";
+                        string content = " ";
+                        ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                        tm.ToastPush(60);
+                    }
+                }
                 //更换壁纸
                 bool deskscr = await settings.TrySetWallpaperImageAsync(file);
 
                 if (!deskscr)
                 {
-                    dialog.Content = "更换壁纸操作失败。";
-                    await dialog.ShowAsync();
+                    string title = "更换壁纸操作失败";
+                    string content = " ";
+                    ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                    tm.ToastPush(60);
+                }
+                else
+                {
+                    //推送Toast通知
+                    string title = "成功更换壁纸";
+                    string content = img.imgName + "\r\n"
+                        + "id" + img.imgId + "\r\n" 
+                        + "作者: " + img.userName;
+                    string image = file.Path;
+                    ToastManagement tm = new ToastManagement(title, content, ToastManagement.WallpaperUpdate, image);
+                    tm.ToastPush(10);
                 }
             }
-            ImageBrush br = new ImageBrush();
-            br.Stretch = Stretch.UniformToFill;
-            br.AlignmentX = AlignmentX.Left;
-            br.AlignmentY = AlignmentY.Top;
-            br.ImageSource = new BitmapImage(new Uri("ms-appdata:///local/" + img.imgId));
-
-            gr.Background = br;
-
-            timer.Interval = TimeSpan.FromMinutes(c.time);
-            timer.Start();
+        }
+        private void ClearExtendedExecution()
+        {
+            if (session != null)
+            {
+                session.Revoked -= SessionRevoked;
+                session.Dispose();
+                session = null;
+            }
         }
 
+        private async void BeginExtendedExecution()
+        {
+            // The previous Extended Execution must be closed before a new one can be requested.
+            ClearExtendedExecution();
 
-        private void Button_Click(object sender, RoutedEventArgs e)     //汉堡界面开关
+            var newSession = new ExtendedExecutionSession();
+            newSession.Reason = ExtendedExecutionReason.Unspecified;
+            newSession.Description = "Raising periodic toasts";
+            newSession.Revoked += SessionRevoked;
+            ExtendedExecutionResult result = await newSession.RequestExtensionAsync();
+
+            switch(result)
+            {
+                case ExtendedExecutionResult.Allowed:
+                    session = newSession;
+                    break;
+                default:
+                case ExtendedExecutionResult.Denied:
+                    newSession.Dispose();
+                    //建立Toast通知
+                    string title = "Pixiv Wallpaper for Windows 10活动被禁止";
+                    string content = "由于系统限制，应用程序无法在后台继续活动。";
+                    ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                    tm.ToastPush(120);
+                    break;
+            }
+        }
+
+        private async void SessionRevoked(object sender, ExtendedExecutionRevokedEventArgs args)
+        {
+            //session被系统回收时记录原因，session被回收则无法保持后台运行
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                switch (args.Reason)
+                {
+                    case ExtendedExecutionRevokedReason.Resumed:
+                        Debug.WriteLine("Extended execution revoked due to returning to foreground.");
+                        break;
+                    case ExtendedExecutionRevokedReason.SystemPolicy:
+                        Debug.WriteLine("Extended execution revoked due to system policy.");
+                        string title = "Pixiv Wallpaper for Windows 10后台活动被系统关闭";
+                        string content = "系统回收了应用的会话资源，应用程序在后台时将会被挂起无法继续运行。" +
+                        "若希望使此应用在后台活动，请尝试插入外部电源或更改电源设置允许应用运行后台任务";
+                        ToastManagement tm = new ToastManagement(title, content, ToastManagement.ExtendedRevoked);
+                        tm.ToastPush(120);
+                        break;
+                }
+            });
+        }
+
+        private async void RegistTask()
+        {
+            // Otherwise request access
+            var status = await BackgroundExecutionManager.RequestAccessAsync();
+            if(status == BackgroundAccessStatus.DeniedBySystemPolicy||status == BackgroundAccessStatus.Unspecified)
+            {
+                string title = "应用后台活动被禁止";
+                string content = "由于系统限制，应用程序无法在后台活动。" +
+                        "若希望使此应用在后台活动，请尝试更改电源设置以及插入外部电源";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(120);
+            }
+            else
+            {
+                foreach (var i in BackgroundTaskRegistration.AllTasks.Values)
+                {
+                    if (i.Name.Equals("TimeBackgroundTrigger"))
+                    {
+                        i.Unregister(true);//将之前的时间触发器任务注销
+                    }
+                }
+                //注册新的时间触发器
+                BackgroundTaskBuilder timeBuilder = new BackgroundTaskBuilder();
+                timeBuilder.Name = "TimeBackgroundTrigger";
+                timeBuilder.SetTrigger(new TimeTrigger(Convert.ToUInt32(c.time), true));
+                timeBuilder.IsNetworkRequested = true;
+                timeBuilder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
+                BackgroundTaskRegistration task = timeBuilder.Register();
+            } 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)     //导航视图开关
         {
             lis.IsPaneOpen = !lis.IsPaneOpen;
         }
@@ -201,10 +312,34 @@ namespace Pixiv_Wallpaper_for_Win10
             update();
         }
 
-        private async void visiturl_btn_Click(object sender, RoutedEventArgs e)       //访问p站
+        private void visiturl_btn_Click(object sender, RoutedEventArgs e)       //访问p站
         {
-            var uriPixiv = new Uri(@"https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + img.imgId);
-            var visit = await Windows.System.Launcher.LaunchUriAsync(uriPixiv);
+            var uriPixiv = new Uri(@"https://www.pixiv.net/artworks/" + img.imgId);
+            var visit = Windows.System.Launcher.LaunchUriAsync(uriPixiv);
+        }
+
+        private void setWallpaper_btn_Click(object sender, RoutedEventArgs e)
+        {
+            SetWallpaper(true);
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            switch(c.mode)
+            {
+                case "Top_50":
+                    await Task.Run(async () => { await top50.listUpdate(true); });
+                    break;
+                case "You_Like_V1":
+                    await Task.Run(async () => { await like.ListUpdateV1(true); });
+                    break;
+                case "You_Like_V2":
+                    await like.ListUpdateV2(true);
+                    break;
+                default:
+                    await Task.Run(async () => { await top50.listUpdate(true); });
+                    break;
+            }
         }
     }
 }

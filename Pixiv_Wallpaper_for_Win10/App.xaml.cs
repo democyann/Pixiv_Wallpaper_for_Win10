@@ -1,12 +1,18 @@
-﻿using System;
+﻿using Microsoft.QueryStringDotNET;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Background;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
+using Windows.UI.Notifications;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -15,7 +21,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace Pixiv_Wallpaper_for_Win10
+namespace Pixiv_Wallpaper_for_Windows_10
 {
     /// <summary>
     /// 提供特定于应用程序的行为，以补充默认的应用程序类。
@@ -70,6 +76,10 @@ namespace Pixiv_Wallpaper_for_Win10
                 }
                 // 确保当前窗口处于活动状态
                 Window.Current.Activate();
+                CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
+                ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+                titleBar.ButtonBackgroundColor = Colors.Transparent;
+                titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
             }
         }
 
@@ -94,6 +104,48 @@ namespace Pixiv_Wallpaper_for_Win10
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: 保存应用程序状态并停止任何后台活动
+            deferral.Complete();
+        }
+
+        protected async override void OnActivated(IActivatedEventArgs e)
+        {
+            Frame frame = Window.Current.Content as Frame;
+            if (e is ToastNotificationActivatedEventArgs)
+            {
+                var toastActivationArgs = e as ToastNotificationActivatedEventArgs;
+                QueryString args = QueryString.Parse(toastActivationArgs.Argument);
+                switch (args.ToString())
+                {
+                    case "action&NextIllust":
+                        MainPage.mp.SetWallpaper(await MainPage.mp.update());
+                        if (frame.Content is MainPage)
+                            break;
+                        frame.Navigate(typeof(MainPage));
+                        break;
+                    case "action&BatterySetting":
+                        //唤起Windows电源设置
+                        await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:batterysaver"));
+                        if (frame.Content is MainPage)
+                            break;
+                        frame.Navigate(typeof(MainPage));
+                        break;
+                }
+            }
+            Window.Current.Activate();
+            CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
+            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.ButtonBackgroundColor = Colors.Transparent;
+            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+        }
+
+        protected override async void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            var deferral = args.TaskInstance.GetDeferral();
+            //由TimeTrigger触发的后台活动
+            if (args.TaskInstance.Task.Name.Equals("TimeBackgroundTrigger"))
+            {
+                MainPage.mp.SetWallpaper(await MainPage.mp.update());
+            }
             deferral.Complete();
         }
     }

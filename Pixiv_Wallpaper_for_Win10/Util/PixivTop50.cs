@@ -6,25 +6,22 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections;
+using System.Collections.Concurrent;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
     class PixivTop50
     {
-        public static ArrayList results = new ArrayList();
-        private Pixiv p;
+        public ConcurrentQueue<string> results = new ConcurrentQueue<string>();
+        private Pixiv p = new Pixiv();
 
-        public PixivTop50()
-        {
-            p = new Pixiv();
-        }
 
         /// <summary>
         /// 作品类别更新
         /// </summary>
         /// <param name="flag">是否无视列表情况强制更新 默认为否</param>
         /// <returns></returns>
-        public async Task<ArrayList> listUpdate(bool flag = false)
+        public async Task<ConcurrentQueue<string>> listUpdate(bool flag = false)
         {
             if (results == null || results.Count <=0 || flag)
             {
@@ -44,19 +41,20 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             ImageInfo img = null;
             if (results != null && results.Count > 0)
             {
+                string id = "";
                 while (true)
                 {
-                    Random r = new Random();
-                    int number = r.Next(0, 50);
-                    if (results[number] != null)
+                    if (results.TryDequeue(out id))
                     {
-                        string imgid = results[number].ToString();
-                        img = await p.getImageInfo(imgid);                      
+                        img = await p.getImageInfo(id);                      
                     }
                     break;
                 }
 
-                await p.downloadImg(img);
+                if(!await p.downloadImg(img))
+                {
+                    img = null;
+                }
 
             }
             return img;

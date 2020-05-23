@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
     /// <summary>
     /// 图片信息实体类
@@ -35,10 +35,6 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         /// 是否为R18作品
         /// </summary>
         public bool isR18 { get; set; }
-        /// <summary>
-        /// 作品tags
-        /// </summary>
-        public string tag { get; set; }
         /// <summary>
         /// 浏览数
         /// </summary>

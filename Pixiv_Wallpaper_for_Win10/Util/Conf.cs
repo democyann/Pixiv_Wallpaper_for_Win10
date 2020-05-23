@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
     /// <summary>
     /// 设置管理类
@@ -23,7 +23,7 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         {
             get
             {
-                if (localSettings.Values["Account"]!=null)
+                if (localSettings.Values["Account"] != null)
                 {
                     return localSettings.Values["Account"].ToString();
                 }
@@ -31,6 +31,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     return "";
                 }
+            }
+            set
+            {
+                localSettings.Values["Account"] = value;
             }
         }
 
@@ -50,6 +54,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     return "";
                 }
             }
+            set
+            {
+                localSettings.Values["Password"] = value;
+            }
         }
 
         /// <summary>
@@ -67,6 +75,10 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                 {
                     return localSettings.Values["Mode"].ToString();
                 }
+            }
+            set
+            {
+                localSettings.Values["Mode"] = value;
             }
         }
 
@@ -86,22 +98,30 @@ namespace Pixiv_Wallpaper_for_Win10.Util
                     return Convert.ToInt32(localSettings.Values["Time"]);
                 }
             }
+            set
+            {
+                localSettings.Values["Time"] = value;
+            }
         }
         /// <summary>
         /// 是否更改锁屏
         /// </summary>
-        public int lockscr
+        public bool lockscr
         {
             get
             {
                 if (localSettings.Values["Lock"] == null)
                 {
-                    return 0;
+                    return false;
                 }
                 else
                 {
-                    return Convert.ToInt32(localSettings.Values["Lock"]);
+                    return Convert.ToBoolean(localSettings.Values["Lock"]);
                 }
+            }
+            set
+            {
+                localSettings.Values["Lock"] = value;
             }
         }
 
@@ -169,6 +189,25 @@ namespace Pixiv_Wallpaper_for_Win10.Util
             set
             {
                 localSettings.Values["lastImg"] = JsonConvert.SerializeObject(value);
+            }
+        }
+
+        
+        /// <summary>
+        /// 后台模式
+        /// </summary>
+        public string backgroundMode
+        {
+            get
+            {
+                if (localSettings.Values["BackgroundMode"] == null)
+                    return "ExtendedSession";
+                else
+                    return localSettings.Values["BackgroundMode"].ToString();
+            }
+            set
+            {
+                localSettings.Values["BackgroundMode"] = value;
             }
         }
     }

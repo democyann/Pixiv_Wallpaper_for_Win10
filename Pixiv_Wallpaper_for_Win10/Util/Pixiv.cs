@@ -8,41 +8,44 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Windows.UI.Popups;
+using Windows.UI.Xaml;
+using Windows.Data.Json;
+using PixivCS;
+using System.Collections.Concurrent;
+using System.Web;
+using System.IO;
 
-namespace Pixiv_Wallpaper_for_Win10.Util
+namespace Pixiv_Wallpaper_for_Windows_10.Util
 {
-    class Pixiv
+    public class Pixiv
     {
-        private readonly String INDEX_URL = "https://www.pixiv.net";
-        private readonly String POST_KEY_URL = "https://accounts.pixiv.net/login?lang=zh&source=pc&view_type=page&ref=wwwtop_accounts_index";
-        private readonly String LOGIN_URL = "https://accounts.pixiv.net/api/login?lang=zh";
-        private readonly String RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=500&tt=";
-        private readonly String ILLUST_URL = "https://www.pixiv.net/rpc/illust_list.php?verbosity=&exclude_muted_illusts=1&illust_ids=";
-        private readonly String DETA_URL = "https://app-api.pixiv.net/v1/illust/detail?illust_id=";
-        private readonly String RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
-        private Conf c;
+        private readonly string INDEX_URL = "https://www.pixiv.net";
+        private readonly string RECOMM_URL = "https://www.pixiv.net/rpc/recommender.php?type=illust&sample_illusts=auto&num_recommendations=1000&page=discovery&mode=all&tt=";
+        private readonly string DETA_URL = "https://api.imjad.cn/pixiv/v1/?type=illust&id=";
+        private readonly string RALL_URL = "https://www.pixiv.net/ranking.php?mode=daily&content=illust&p=1&format=json";
 
         public string cookie { get; set; }
         public string token { get; set; }
-
+        private string nexturl = "begin";
+        private PixivBaseAPI baseAPI;
         public Pixiv()
         {
-            c = new Conf();
+            baseAPI = new PixivBaseAPI();
         }
+
 
         /// <summary>
         /// 获取TOP 50推荐列表
         /// </summary>
         /// <returns></returns>
-        public async Task<ArrayList> getRallist()
+        public async Task<ConcurrentQueue<string>> getRallist()
         {
             string rall;
-            ArrayList list = new ArrayList();
+            ConcurrentQueue<string> queue = new ConcurrentQueue<string>();
             HttpUtil top50 = new HttpUtil(RALL_URL, HttpUtil.Contype.JSON);
 
             rall = await top50.GetDataAsync();
-
-            Debug.WriteLine(rall);
 
             if (!rall.Equals("ERROR"))
             {
@@ -51,94 +54,37 @@ namespace Pixiv_Wallpaper_for_Win10.Util
 
                 foreach (JToken j in arr)
                 {
-                    list.Add(j["illust_id"].ToString());
-                    Debug.WriteLine(j["illust_id"].ToString());
+                    queue.Enqueue(j["illust_id"].ToString());
                 }
             }
             else
             {
-                Debug.WriteLine("ERROR");
+                string title = "获取插画队列时发生错误";
+                string content = " ";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
             }
-            return list;
-        }
-
-        /// <summary>
-        /// 获取POST KEY 私有方法
-        /// </summary>
-        /// <returns>POST KEY</returns>
-        private async Task<string> postKey()
-        {
-            string key = "";
-            //获取POST KEY
-
-            HttpUtil posturl = new HttpUtil(POST_KEY_URL, HttpUtil.Contype.HTML);
-            string poststr = await posturl.GetDataAsync();
-            if (!posturl.Equals("ERROR"))
-            {
-                Regex r = new Regex("name=\"post_key\"\\svalue=\"([a-z0-9]{32})\"", RegexOptions.Singleline);
-                if (r.IsMatch(poststr))
-                {
-                    key = r.Match(poststr).Groups[1].ToString();
-                    cookie = posturl.cookie;
-                }
-            }
-            Debug.WriteLine("POST KEY:" + key);
-            return key;
-        }
-
-        /// <summary>
-        /// 登录
-        /// </summary>
-        /// <returns>true 登录成功 false 登录失败</returns>
-        private async Task<bool> login()
-        {
-            bool f = false;
-            string postkey = await postKey();
-            HttpUtil loginurl = new HttpUtil(LOGIN_URL, HttpUtil.Contype.JSON);
-            loginurl.cookie = cookie;
-            string pram = "pixiv_id=" + c.account
-                        + "&password=" + c.password
-                        + "&captcha=&g_recaptcha_response=&post_key=" + postkey
-                        + "&source=pc&ref=wwwtop_accounts_index&return_to=http://www.pixiv.net/";
-
-            string data = await loginurl.PostDataAsync(pram);
-
-            if (!data.Equals("ERROR"))
-            {
-                dynamic o = JObject.Parse(data);
-                if (o.body.success != null)
-                {
-                    cookie = loginurl.cookie;
-                    f = true;
-                }
-            }
-
-            return f;
+            return queue;
         }
 
         /// <summary>
         /// 获取Token
         /// </summary>
-        /// <param name="flag">true 登录获取，false 不登录获取</param>
         /// <returns></returns>
-        public async Task<bool> getToken(bool flag = false)
+        public async Task<bool> getToken(string cookie)
         {
             bool f = false;
-            if (flag)
-            {
-                if (!await login()) return f;
-            }
-
             HttpUtil tokurl = new HttpUtil(INDEX_URL, HttpUtil.Contype.HTML);
+            this.cookie = cookie;
             tokurl.cookie = cookie;
             string data = await tokurl.GetDataAsync();
             if (!data.Equals("ERROR"))
             {
+                Console.WriteLine("token:" + data);
                 Regex r = new Regex("pixiv.context.token\\s=\\s\"([a-z0-9]{32})\"");
                 if (r.IsMatch(data))
                 {
                     token = r.Match(data).Groups[1].ToString();
-                    Debug.WriteLine("TOKEN:" + token);
                     f = true;
                 }
             }
@@ -146,148 +92,215 @@ namespace Pixiv_Wallpaper_for_Win10.Util
         }
 
         /// <summary>
-        /// 获取"猜你喜欢"推荐列表
+        /// 获取"猜你喜欢"推荐列表(Web模拟)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>插画id队列</returns>
 
-        public async Task<ArrayList> getRecommlist()
+        public async Task<ConcurrentQueue<string>> getRecommlistV1()
         {
             string like;
-            ArrayList list = new ArrayList();
-            HttpUtil recomm = new HttpUtil(RECOMM_URL+token, HttpUtil.Contype.JSON);
+            ConcurrentQueue<string> queue = new ConcurrentQueue<string>();
+            HttpUtil recomm = new HttpUtil(RECOMM_URL + token, HttpUtil.Contype.JSON);
             recomm.cookie = cookie;
-            recomm.referer = "http://www.pixiv.net/recommended.php";
+            recomm.referrer = "https://www.pixiv.net/discovery";
 
             like = await recomm.GetDataAsync();
-
-            Debug.WriteLine(like);
 
             if (like != "ERROR")
             {
                 dynamic o = JObject.Parse(like);
                 JArray arr = o.recommendations;
-                foreach(JToken j in arr)
+                foreach (JToken j in arr)
                 {
-                    list.Add(j.ToString());
-                    Debug.WriteLine(j.ToString());
+                    queue.Enqueue(j.ToString());
                 }
             }
-            else
-                Debug.WriteLine("ERROR");
-            return list;
+    
+            return queue;
         }
+
         /// <summary>
-        /// 图片信息查询子方法1(R18作品无法查询地址)
+        /// 获取"猜你喜欢"(PixivCS Api)
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="password"></param>
+        /// <returns>插画信息队列</returns>
+        public async Task<ConcurrentQueue<ImageInfo>> getRecommenlistV2(string account = null, string password = null)
+        {
+            ConcurrentQueue<ImageInfo> queue = new ConcurrentQueue<ImageInfo>();
+            JsonObject recommends = new JsonObject();
+            if (baseAPI.AccessToken == null)
+            {
+                try
+                {
+                    JsonObject baseRes = null;
+                    baseRes = await baseAPI.Auth(account, password);
+                    string db = baseRes.ToString();
+                    Debug.Write(db);
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                    return null;
+                }
+            }
+            //是否使用nexturl更新list
+            if ("begin".Equals(nexturl))
+            {
+                recommends = await new PixivAppAPI(baseAPI).IllustRecommended();
+            }
+            else
+            {
+                Uri next = new Uri(nexturl);
+                string getparam(string param) => HttpUtility.ParseQueryString(next.Query).Get(param);
+                recommends = await new PixivAppAPI(baseAPI).IllustRecommended
+                    (ContentType: getparam("content_type"),
+                     IncludeRankingLabel: bool.Parse(getparam("include_ranking_label")),
+                     Filter: getparam("filter"),
+                     MinBookmarkIDForRecentIllust: getparam("min_bookmark_id_for_recent_illust"),
+                     MaxBookmarkIDForRecommended: getparam("max_bookmark_id_for_recommend"),
+                     Offset: getparam("offset"),
+                     IncludeRankingIllusts: bool.Parse(getparam("include_ranking_illusts")),
+                     IncludePrivacyPolicy: getparam("include_privacy_policy"));
+            }
+            try
+            {
+                string str = recommends["illusts"].ToString();
+                nexturl = recommends["next_url"].GetString();
+                JArray arr = JArray.Parse(recommends["illusts"].ToString());
+                foreach (JToken ill in arr)
+                {
+                    if (ill["meta_single_page"]["original_image_url"] != null)
+                    {
+                        ImageInfo imginfo = new ImageInfo();
+                        imginfo.imgUrl = ill["meta_single_page"]["original_image_url"].ToString();
+                        imginfo.viewCount = (int)ill["total_view"];
+                        imginfo.isR18 = false;
+                        imginfo.userId = ill["user"]["id"].ToString();
+                        imginfo.userName = ill["user"]["account"].ToString();
+                        imginfo.imgId = ill["id"].ToString();
+                        imginfo.imgName = ill["title"].ToString();
+                        imginfo.height = (int)ill["height"];
+                        imginfo.width = (int)ill["width"];
+
+                        queue.Enqueue(imginfo);                        
+                    }  
+                }
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+            return queue;
+        }
+
+        /// <summary>
+        /// 插画信息查询子方法1
         /// </summary>
         /// <param name="imgid">要查找的作品ID</param>
         /// <returns></returns>
-        private async Task<string> getImageInfoSub1(string imgid)
+        private async Task<string> getImageInfoSub(string imgid)
         {
             HttpUtil info1 = new HttpUtil(DETA_URL + imgid, HttpUtil.Contype.JSON);
             string data = await info1.GetDataAsync();
-            Debug.WriteLine(data);
-
             return data;
         }
-        /// <summary>
-        /// 图片信息查询子方法2
-        /// </summary>
-        /// <param name="imgid">要查找的作品ID</param>
-        /// <returns></returns>
-        private async Task<string> getImageInfoSub2(string imgid)
-        {
-            HttpUtil info2 = new HttpUtil(ILLUST_URL + imgid + "&tt=" + token, HttpUtil.Contype.JSON);
-            info2.cookie = c.cookie;
-            info2.referer = "http://www.pixiv.net/recommended.php";
-            string data = await info2.GetDataAsync();
-            Debug.WriteLine(data);
-
-            return data;
-        }
+       
 
         /// <summary>
-        /// 查询图片信息
+        /// 查询插画信息
         /// </summary>
         /// <param name="id">要查找的作品ID</param>
         /// <returns></returns>
         public async Task<ImageInfo> getImageInfo(string id)
         {
             ImageInfo imginfo = null;
-            string info1 = await getImageInfoSub1(id);
+            string info1 = await getImageInfoSub(id);
             if (!info1.Equals("ERROR"))
             {
                 imginfo = new ImageInfo();
 
                 dynamic o = JObject.Parse(info1);
-                dynamic ill = o.illust;
-                dynamic imgurl;
-                imginfo.viewCount = (int)ill.total_view;
-
-                if ((int)ill.page_count > 1)
+                dynamic ill = o.response;
+                imginfo.viewCount = (int)ill[0]["stats"]["views_count"];
+                imginfo.imgUrl = ill[0]["image_urls"]["large"].ToString();
+                switch(ill[0]["age_limit"].ToString())
                 {
-                    imgurl = ill.meta_pages[0].image_urls;
-                    imginfo.imgUrl = imgurl.original;
+                    case "all_age":
+                        imginfo.isR18 = false;
+                        break;
+                    case "limit_r18":
+                        imginfo.isR18 = true;
+                        break;
                 }
-                else
-                {
-                    imgurl = ill.meta_single_page;
-                    imginfo.imgUrl = imgurl.original_image_url;
-                }
-                imginfo.isR18 = imginfo.imgUrl.Contains("limit_r18");
-
-                dynamic user = ill.user;
-
-                imginfo.userId = user.id;
-                imginfo.userName = user.name;
-                imginfo.imgId = ill.id;
-                imginfo.imgName = ill.title;
-                imginfo.tag = ill.tags.ToString();
-                imginfo.height = (int)ill.height;
-                imginfo.width = (int)ill.width;
-
-                //如为R18作品使用下面方法查询
-                if (imginfo.isR18)
-                {
-                    string info2 = await getImageInfoSub2(id);
-                    if (!info2.Equals("ERROR"))
-                    {
-                        Debug.WriteLine(info2);
-                        dynamic d = JArray.Parse(info2)[0];
-                        imginfo.userId = d.illust_user_id;
-                        imginfo.imgId = d.illust_id;
-                        imginfo.imgUrl = d.url;
-                        imginfo.userName = d.user_name;
-                        imginfo.imgName = d.illust_title;
-                        imginfo.tag = d.tags.ToString();
-
-                    }
-                    else
-                    {
-                        imginfo = null;
-                    }
-                }
+                imginfo.userId = ill[0]["user"]["id"].ToString();
+                imginfo.userName = ill[0]["user"]["name"].ToString();
+                imginfo.imgId = ill[0]["id"].ToString() ;
+                imginfo.imgName = ill[0]["title"].ToString();
+                imginfo.height = (int)ill[0]["height"];
+                imginfo.width = (int)ill[0]["width"];
 
             }
-
             return imginfo;
         }
 
         /// <summary>
-        /// 图片下载
+        /// 插画下载
         /// </summary>
-        /// <param name="img">要下载的图片信息</param>
-        /// <returns></returns>
-        public async Task<string> downloadImg(ImageInfo img)
+        /// <param name="img">要下载的插画信息</param>
+        /// <returns>是否成功下载插画</returns>
+        public async Task<bool> downloadImg(ImageInfo img)
         {
             Regex reg = new Regex("/c/[0-9]+x[0-9]+/img-master");
             img.imgUrl = reg.Replace(img.imgUrl, "/img-master", 1);
 
             HttpUtil download = new HttpUtil(img.imgUrl, HttpUtil.Contype.IMG);
-            download.referer = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + img.imgId;
-            download.cookie = c.cookie;
-            string path = await download.ImageDownloadAsync(img.imgId);
-            return path;
+            download.referrer = "https://www.pixiv.net/artworks/" + img.imgId;
+            download.cookie = cookie;
+            string check = await download.ImageDownloadAsync(img.imgId);
+            if (!"ERROR".Equals(check))
+                return true;
+            else
+                return false;
         }
 
+        /// <summary>
+        /// 使用PixivCS API进行插画下载
+        /// </summary>
+        /// <param name="img"></param>
+        /// <returns>是否成功下载插画</returns>
+        public async Task<bool> downloadImgV2(ImageInfo img)
+        {
+            try
+            {
+                using (Stream resStream = await (await new PixivAppAPI(baseAPI).RequestCall("GET",
+                      img.imgUrl, new Dictionary<string, string>() { { "Referer", "https://app-api.pixiv.net/" } })).
+                      Content.ReadAsStreamAsync())
+                {
+                    StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(img.imgId, CreationCollisionOption.OpenIfExists);
+                    using (Stream writer = await file.OpenStreamForWriteAsync())
+                    {
+                        await resStream.CopyToAsync(writer);
+                        return true;
+                    }
+                }
+            }
+            catch(Exception)
+            {
+                //使UI线程调用lambda表达式内的方法
+                /*await MainPage.mp.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    //UI code here
+                    MessageDialog dialog = new MessageDialog("");
+                    dialog.Content = "获取插画时发生未知错误";
+                    await dialog.ShowAsync();
+                });*/
+                string title = "下载插画时发生未知错误";
+                string content = " ";
+                ToastManagement tm = new ToastManagement(title, content, ToastManagement.ErrorMessage);
+                tm.ToastPush(60);
+                return false;
+            }
+        }
     }
 }
